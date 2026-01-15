@@ -62,8 +62,8 @@ export default function Projects() {
 
             <p className="mb-3">
                 Worked on a 6-person development team to maintain and extend the production system.
-                Primary responsibilities included frontend bug resolution in React and proprietary
-                JDSL framework, backend data integrity maintenance, and feature development to 
+                Primary responsibilities included frontend bug resolution in React and python framework, 
+                backend data integrity maintenance, and feature development to 
                 support evolving client requirements.
             </p>
 
