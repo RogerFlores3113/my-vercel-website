@@ -1,8 +1,34 @@
 @import "tailwindcss";
 
+/* ============================================
+   DESIGN TOKENS — Direction C: Personal & Warm
+   ============================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Backgrounds */
+  --background: #FAF7F2;
+  --background-card: #FFFFFF;
+  --background-elevated: #F0EBE3;
+
+  /* Text */
+  --foreground: #2C2B28;
+  --foreground-muted: #6B6963;
+  --foreground-faint: #9C9A92;
+
+  /* Accent — Sage/Teal (primary) */
+  --accent: #0F6E56;
+  --accent-light: #E1F5EE;
+  --accent-dark: #085041;
+  --accent-mid: #5DCAA5;
+
+  /* Accent — Coral (secondary, for professional highlights) */
+  --coral: #D85A30;
+  --coral-light: #FAECE7;
+  --coral-dark: #993C1D;
+
+  /* Borders */
+  --border: #E2DED6;
+  --border-hover: #C8C3B9;
 }
 
 @theme inline {
@@ -14,13 +40,178 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1A1917;
+    --background-card: #242320;
+    --background-elevated: #2E2D2A;
+
+    --foreground: #E8E6E1;
+    --foreground-muted: #A8A69E;
+    --foreground-faint: #73716B;
+
+    --accent: #5DCAA5;
+    --accent-light: #0F3D30;
+    --accent-dark: #9FE1CB;
+    --accent-mid: #0F6E56;
+
+    --coral: #F0997B;
+    --coral-light: #3A2218;
+    --coral-dark: #F5C4B3;
+
+    --border: #3A3935;
+    --border-hover: #4E4D48;
   }
 }
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+/* ============================================
+   PAGE TRANSITION — fade up on load
+   ============================================ */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+main {
+  animation: fadeUp 0.45s ease-out;
+}
+
+/* ============================================
+   LINK BASE STYLES
+   ============================================ */
+
+a {
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Pill-shaped social/action links */
+.pill-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.pill-link:hover {
+  background: var(--accent-mid);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Tech stack tags */
+.tech-tag {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 12px;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Project cards */
+.project-card {
+  background: var(--background-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-hover);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Category labels on cards */
+.label-pro {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--coral);
+}
+
+.label-personal {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+}
+
+/* Section eyebrow text */
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--foreground-faint);
+  margin-bottom: 16px;
+}
+
+/* CTA banner */
+.cta-banner {
+  background: var(--accent-dark);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+}
+
+.cta-banner h3 {
+  color: var(--accent-light);
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.cta-banner p {
+  color: var(--accent-mid);
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.cta-banner a {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 24px;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.cta-banner a:hover {
+  transform: translateY(-1px);
+  background: #fff;
 }

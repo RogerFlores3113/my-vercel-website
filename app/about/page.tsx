@@ -1,94 +1,111 @@
-import Link from "next/link";
+import { CTABanner } from "../layout";
 
 export default function About() {
   return (
-    <main className="max-w-3xl mx-auto p-8">
-      {/* Header Section */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold mb-2">Roger Flores</h1>
+    <main className="max-w-3xl mx-auto px-6">
+      {/* ============================================
+          HEADER + PHOTO
+          ============================================ */}
+      <section className="pt-16 pb-10">
+        <h1 className="text-4xl font-medium tracking-tight mb-2">About me</h1>
         <a
           href="mailto:rflores3113@gmail.com"
-          className="text-blue-500 hover:text-blue-400 hover:underline text-lg transition-colors"
+          className="text-[var(--accent)] hover:underline text-[15px]"
         >
           rflores3113@gmail.com
         </a>
-      </div>
+      </section>
 
-      {/* Photo and Bio */}
-      <div className="mb-12 flex flex-col md:flex-row gap-8 items-start">
+      {/* Photo  wider aspect ratio, full-width */}
+      <div className="mb-10 rounded-2xl overflow-hidden">
         <img
           src="/Roger_Website.jpg"
-          alt="Profile photo"
-          className="w-96 h-96 rounded-lg object-cover"
+          alt="Roger Flores"
+          className="w-full aspect-[16/10] object-cover"
         />
-        <div className="flex-1 space-y-4">
-          <p className="text-lg leading-relaxed text-gray-300">
-            Hi! I&apos;m Roger Flores, a Programmer who also likes AI research
-            and customer interactions! This is my website. It&apos;s a bit of a
-            stub at the moment, but I&apos;m working on that.
+      </div>
+
+      {/* ============================================
+          BIO
+          ============================================ */}
+      <section className="mb-14">
+        <div className="space-y-4 text-[17px] leading-relaxed text-[var(--foreground-muted)]">
+          <p>
+            I&apos;m a software engineer who&apos;s happiest when a problem
+            requires both technical depth and talking to real people. My
+            professional work has ranged from ML-powered inventory optimization
+            for Fortune 500 companies to deploying property appraisal systems
+            for county governments.
           </p>
-          <p className="text-lg leading-relaxed text-gray-300">
-            Check out my latest project{" "}
-            <a
-              href="https://podium-beta.vercel.app/"
-              className="text-blue-500 hover:text-blue-400 hover:underline transition-colors"
-            >
-              here
-            </a>
-            !
-          </p>
-          <p className="text-lg leading-relaxed font-semibold">
-            Job searching for Software Engineering / AI Engineering roles,
-            contact me if interested!
+          <p>
+            I&apos;m drawn to the kind of work where you have to figure out
+            what the actual problem is before you can solve it. Client-facing
+            requirements gathering, ambiguous data, systems that need to work
+            in the real world; these are where I do my best work.
           </p>
         </div>
-      </div>
+      </section>
 
-      {/* Interests Section */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">Interests</h2>
-        <ul className="text-gray-400 leading-relaxed space-y-2 list-disc list-inside">
-          <li>I read a lot. Check my reading list for more.</li>
-          <li>
-            I enjoy board games — Terraforming Mars and BoTC mainly.
-          </li>
-          <li>
-            Rock climbing is my activity of choice, but I also love hikes and
-            flying!
-          </li>
-          <li>Still searching for the perfect morning green tea.</li>
-        </ul>
-      </div>
-
-      {/* What I'm Doing Now */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">What I&apos;m Doing Now</h2>
-        <div className="text-gray-400 leading-relaxed space-y-4">
+      {/* ============================================
+          WHAT I'M DOING NOW
+          ============================================ */}
+      <section className="mb-14">
+        <p className="eyebrow">What I&apos;m doing now</p>
+        <div className="space-y-4 text-[15px] leading-relaxed text-[var(--foreground-muted)]">
           <p>
-            Working on an LLM assistant, found{" "}
-            <Link
+            Building{" "}
+            <a
               href="https://podium-beta.vercel.app/"
-              className="text-blue-500 hover:text-blue-400 hover:underline transition-colors"
+              className="text-[var(--accent)] hover:underline"
             >
-              here
-            </Link>
-            .
+              Podium
+            </a>
+            , an LLM assistant. The beta is live. Try it out!
           </p>
-          <p>I&apos;m training to get my Private Pilot&apos;s license.</p>
           <p>
-            Looking into Andrej Karpathy&apos;s{" "}
+            Training toward my private pilot&apos;s license.
+          </p>
+          <p>
+            Exploring Andrej Karpathy&apos;s{" "}
             <a
               href="https://github.com/karpathy/nanochat"
-              className="text-blue-500 hover:text-blue-400 hover:underline transition-colors"
+              target="_blank"
+              className="text-[var(--accent)] hover:underline"
             >
               nanochat
-            </a>
-            . Specifically, I&apos;m exploring how to train a model meant for
-            40hrs of runtime on an 8xH100 GPU on my own 4080 Super, while still
-            getting good results.
+            </a>{" "}
+            — specifically, how to get meaningful results from a model designed
+            for 40 hours on 8×H100 GPUs when all I have is a 4080 Super.
           </p>
         </div>
-      </div>
+      </section>
+
+      {/* ============================================
+          INTERESTS
+          ============================================ */}
+      <section className="mb-14">
+        <p className="eyebrow">Interests</p>
+        <p className="text-[15px] leading-relaxed text-[var(--foreground-muted)]">
+          I read a lot :D {" "}
+          <a
+            href="/reading"
+            className="text-[var(--accent)] hover:underline"
+          >
+            here&apos;s what I&apos;ve been reading
+          </a>
+          . I play board games (Terraforming Mars and Blood on the Clocktower
+          are current favorites). Rock climbing is my main physical activity,
+          but I also love hiking and flying. And I&apos;m still searching for
+          the perfect morning green tea. If you have any leads i'll take thdm!
+        </p>
+      </section>
+
+      {/* ============================================
+          CTA
+          ============================================ */}
+      <section className="mb-16">
+        <CTABanner />
+      </section>
     </main>
   );
 }
