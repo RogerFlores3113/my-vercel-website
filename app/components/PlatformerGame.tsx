@@ -284,6 +284,18 @@ export function PlatformerGame() {
             { key: "flowers-forest", xFrac: 0.18, yAbove: -6, scale: 1.4, layer: "fg" },
             { key: "flowers-forest", xFrac: 0.58, yAbove: -6, scale: 1.2, flipX: true, layer: "fg" },
             { key: "flowers-forest", xFrac: 0.86, yAbove: -6, scale: 1.1, layer: "fg" },
+            // fg — fern clusters (odd groupings, varying scale)
+            { key: "fern-cluster", xFrac: 0.10, yAbove: 0, scale: 1.1, layer: "fg" },
+            { key: "fern-cluster", xFrac: 0.48, yAbove: 0, scale: 0.85, flipX: true, layer: "fg" },
+            { key: "fern-cluster", xFrac: 0.88, yAbove: 0, scale: 1.3, layer: "fg" },
+            // fg — mushroom clusters near tree bases (small scale for ground-level)
+            { key: "mushrooms", xFrac: 0.32, yAbove: 0, scale: 0.9, layer: "fg" },
+            { key: "mushrooms", xFrac: 0.70, yAbove: 0, scale: 0.75, flipX: true, layer: "fg" },
+            // bg — mossy rocks scattered across ground
+            { key: "mossy-rocks", xFrac: 0.55, yAbove: 0, scale: 1.0, layer: "bg" },
+            { key: "mossy-rocks", xFrac: 0.90, yAbove: 0, scale: 0.8, flipX: true, layer: "bg" },
+            // bg — hollow fallen log (no collision — player walks through it)
+            { key: "log-hollow", xFrac: 0.50, yAbove: 4, scale: 1.4, layer: "bg" },
           ],
           vines: [
             { xFrac: 0.18, topAbove: 240 },
@@ -440,6 +452,15 @@ export function PlatformerGame() {
             ["flowers-forest",   "/props/flowers-forest.png"],
             ["vine-tile",        "/props/vine-tile.png"],
             ["sign-mossy",       "/props/sign-mossy.png"],
+            ["sign-jungle",      "/props/sign-jungle.png"],
+            ["sign-lantern",     "/props/sign-lantern.png"],
+            ["fern-cluster",     "/props/fern-cluster.png"],
+            ["mushrooms",        "/props/mushrooms.png"],
+            ["mossy-rocks",      "/props/mossy-rocks.png"],
+            ["log-hollow",       "/props/log-hollow.png"],
+            ["statue-linkedin",  "/props/statue-linkedin.png"],
+            ["statue-github",    "/props/statue-github.png"],
+            ["statue-email",     "/props/statue-email.png"],
             ["grass-tile",           "/props/grass-tile.png"],
             ["grass-dirt-fill",      "/props/grass-dirt-fill.png"],
             ["grass-dirt-fill-r90",  "/props/grass-dirt-fill_r90.png"],
@@ -703,25 +724,37 @@ export function PlatformerGame() {
           }
 
           // ── Signs (modal triggers) ────────────────────────────────────────────
+          // Rotate through available sign variants for variety
+          const SIGN_KEYS  = ["sign-jungle", "sign-lantern", "sign-mossy"];
+          const SIGN_NAMES: Record<string, string> = {
+            landing: "About Me", projects: "Projects", about: "Now", reading: "Reading",
+          };
           this.signDefs  = [];
           this.signHints = [];
-          for (const sd of theme.signs) {
+          for (let si = 0; si < theme.signs.length; si++) {
+            const sd = theme.signs[si];
             const sx = Math.round(sd.xFrac * width);
             this.signDefs.push({ x: sx, modalId: sd.modalId });
-            const boardY = groundY - 52;
-            if (this.textures.exists("sign-mossy")) {
-              this.add.image(sx, groundY, "sign-mossy")
+            // Pick sign variant (cycle through available keys)
+            const signKey = SIGN_KEYS.find(k => this.textures.exists(k)) ?? null;
+            const altKey  = si % 2 === 1 ? (SIGN_KEYS[1] ?? signKey) : signKey;
+            const usedKey = (altKey && this.textures.exists(altKey)) ? altKey : signKey;
+            const boardY  = groundY - 52;
+            if (usedKey) {
+              this.add.image(sx, groundY, usedKey)
                 .setOrigin(0.5, 1).setScale(2).setDepth(D_SIGN);
-              this.add.text(sx, groundY - 96, "ENT", {
-                fontFamily: "monospace", fontSize: "13px", color: "#d4c8a0",
-              }).setOrigin(0.5).setDepth(D_SIGN);
+              // Label on board
+              const label = SIGN_NAMES[sd.modalId] ?? "ENT";
+              this.add.text(sx, groundY - 88, label, {
+                fontFamily: "monospace", fontSize: "10px", color: "#d4c8a0",
+              }).setOrigin(0.5).setDepth(D_SIGN + 0.1);
             } else {
               this.add.rectangle(sx, groundY - 18, 5, 34, 0x4a2a0a).setDepth(D_SIGN);
               this.add.rectangle(sx, boardY, 90, 36, 0x7a4e22)
                 .setStrokeStyle(2, 0xb07840).setDepth(D_SIGN);
               this.add.rectangle(sx, boardY, 82, 28, 0x8f5e2a).setDepth(D_SIGN);
-              this.add.text(sx, boardY, "ENT", {
-                fontFamily: "monospace", fontSize: "11px", color: "#d4a06a",
+              this.add.text(sx, boardY, SIGN_NAMES[sd.modalId] ?? "ENT", {
+                fontFamily: "monospace", fontSize: "10px", color: "#d4a06a",
               }).setOrigin(0.5).setDepth(D_SIGN);
             }
             const hint = this.add.text(sx, boardY - 24, "[ ENTER ]", {
@@ -737,11 +770,22 @@ export function PlatformerGame() {
             for (const soc of theme.socials) {
               const sx = Math.round(soc.xFrac * width);
               this.socialLinks.push({ x: sx, url: soc.url });
-              // Placeholder pillar (stone column until PixelLab statue assets arrive)
-              this.add.rectangle(sx, groundY, 28, 80, 0x5a3c1e)
-                .setOrigin(0.5, 1).setDepth(D_FGPROP);
-              this.add.rectangle(sx, groundY - 80, 40, 14, 0x8a6030)
-                .setOrigin(0.5, 1).setDepth(D_FGPROP);
+              // Statue image or placeholder pillar
+              const statueKeyMap: Record<string, string> = {
+                "LinkedIn": "statue-linkedin",
+                "GitHub":   "statue-github",
+                "Email":    "statue-email",
+              };
+              const statueKey = statueKeyMap[soc.label];
+              if (statueKey && this.textures.exists(statueKey)) {
+                this.add.image(sx, groundY, statueKey)
+                  .setOrigin(0.5, 1).setScale(2).setDepth(D_FGPROP);
+              } else {
+                this.add.rectangle(sx, groundY, 28, 80, 0x5a3c1e)
+                  .setOrigin(0.5, 1).setDepth(D_FGPROP);
+                this.add.rectangle(sx, groundY - 80, 40, 14, 0x8a6030)
+                  .setOrigin(0.5, 1).setDepth(D_FGPROP);
+              }
               // Warm flicker glow behind each torch
               const glow = this.add.circle(sx, groundY - 100, 16, 0xff8820, 0.25)
                 .setDepth(D_BGFX);
