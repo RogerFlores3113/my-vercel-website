@@ -5,11 +5,18 @@ import { GameLoader } from "./GameLoader";
 
 // ─── Room config (order = left-to-right in the world) ─────────────────────────
 const ROOMS = [
-  { key: "landing",  modalId: "landing"  },
-  { key: "projects", modalId: "projects" },
-  { key: "about",    modalId: "about"    },
-  { key: "reading",  modalId: "reading"  },
+  { key: "landing" },
+  { key: "socials" },  // social links room — no modal, opens URLs
 ] as const;
+
+// Animation dirs on disk (hardcoded to avoid metadata.json key mismatch)
+const ANIM_DIRS = {
+  idle:  "Idle-8d50bd6c",
+  run:   "Slow_Run-0fccd43f",
+  jump:  "Jump-076269b5",
+  climb: "Walk-98912dec",
+} as const;
+function padN(n: number) { return String(n).padStart(3, "0"); }
 
 // ─── Modal content ─────────────────────────────────────────────────────────────
 // Real HTML rendered in a React overlay — links, formatting all work fine.
@@ -133,10 +140,10 @@ function ModalContent({ id }: { id: string }) {
 // ─── Modal overlay ─────────────────────────────────────────────────────────────
 function Modal({ modalId, onClose }: { modalId: string; onClose: () => void }) {
   const titles: Record<string, string> = {
-    landing: "Roger Flores",
+    landing:  "Roger Flores",
     projects: "Projects",
-    about: "About",
-    reading: "Reading",
+    about:    "About",
+    reading:  "Reading",
   };
   return (
     <div
@@ -205,6 +212,16 @@ export function PlatformerGame() {
     return () => window.removeEventListener("open-modal", onOpen);
   }, []);
 
+  // Open social link (Phaser can't call window.open directly — popup blockers)
+  useEffect(() => {
+    const onSocial = (e: Event) => {
+      const { url } = (e as CustomEvent<{ url: string }>).detail;
+      window.open(url, "_blank", "noopener,noreferrer");
+    };
+    window.addEventListener("open-social", onSocial);
+    return () => window.removeEventListener("open-social", onSocial);
+  }, []);
+
   // ── Phaser ────────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (gameRef.current) return;
@@ -213,24 +230,12 @@ export function PlatformerGame() {
     import("phaser").then((Phaser) => {
       if (gameRef.current) return;
 
-      // New PixelLab sprite: individual east-direction PNGs per animation.
-      // idle=8 frames, run=6 frames, jump=8 frames.
-      const RP_ANIMS = {
-        Idle:     { prefix: "rp-idle", count: 8 },
-        Movement: { prefix: "rp-run",  count: 6 },
-        Jump:     { prefix: "rp-jump", count: 8 },
-      } as const;
-
       // ── Room visual themes + platform layouts ─────────────────────────────────
-      // yAbove = pixels above groundY. Max safe jump = 90px (v0²/2g = 600²/4000).
-      // Platforms at 72px are directly jumpable from ground.
-      // Platforms at 150px require a chain: ground→low platform→high platform.
       type PlatformDef = { xFrac: number; yAbove: number; w: number };
-      // Props are bottom-anchored at groundY (yAbove=0) or above it.
-      // layer "bg" = behind player (depth 2), "fg" = in front of player (depth 15).
       type PropDef = { key: string; xFrac: number; yAbove: number; scale?: number; flipX?: boolean; layer?: "bg" | "fg" };
-      // Vines: vertical climbable strips anchored to groundY, extending topAbove px up.
-      type VineDef = { xFrac: number; topAbove: number };
+      type VineDef   = { xFrac: number; topAbove: number };
+      type SignDef   = { xFrac: number; modalId: string };
+      type SocialDef = { xFrac: number; url: string; label: string };
       type RoomTheme = {
         bg: number; ground: number; line: number;
         platformFill: number; platformEdge: number;
@@ -238,32 +243,41 @@ export function PlatformerGame() {
         platforms: PlatformDef[];
         props: PropDef[];
         vines: VineDef[];
-        // Optional fixed spawn point; if omitted uses entry-side default at ground level
+        signs: SignDef[];
+        socials?: SocialDef[];
         spawnXFrac?: number;
         spawnYAbove?: number;
       };
+
       const THEMES: RoomTheme[] = [
-        { // 0 landing — Japanese bamboo forest / Eastern Himalayas (red panda habitat)
+        { // 0 landing — bamboo forest / red panda habitat
           bg: 0x0a1e10, ground: 0x12280e, line: 0x2a5418,
           platformFill: 0x0d2010, platformEdge: 0x4a8c28,
           labelColor: "#4a8c28", arrowColor: "#4a8c28",
           spawnXFrac: 0.50, spawnYAbove: 40,
           platforms: [
-            { xFrac: 0.22, yAbove: 72,  w: 160 }, // left step   — direct jump from ground
-            { xFrac: 0.50, yAbove: 145, w: 155 }, // center ledge (above the sign)
-            { xFrac: 0.78, yAbove: 72,  w: 160 }, // right step  — direct jump from ground
-            { xFrac: 0.35, yAbove: 198, w: 115 }, // high left   — vine-only path
-            { xFrac: 0.65, yAbove: 198, w: 115 }, // high right  — vine-only path
+            // Lower tier — direct jump from ground (~72px)
+            { xFrac: 0.15, yAbove: 72,  w: 130 },
+            { xFrac: 0.38, yAbove: 72,  w: 110 },
+            { xFrac: 0.62, yAbove: 72,  w: 110 },
+            { xFrac: 0.85, yAbove: 72,  w: 130 },
+            // Middle tier — hop from lower (~145px)
+            { xFrac: 0.28, yAbove: 145, w: 120 },
+            { xFrac: 0.72, yAbove: 145, w: 120 },
+            // Upper tier — vine-assisted (~210px)
+            { xFrac: 0.50, yAbove: 210, w: 140 },
+            // Top platform (~275px)
+            { xFrac: 0.50, yAbove: 275, w: 100 },
           ],
           props: [
-            // bg — rhododendron trees, planted into ground (negative yAbove sinks base below groundY)
+            // bg — rhododendron trees
             { key: "tree-himalaya", xFrac: 0.06, yAbove: -18, scale: 2.2, layer: "bg" },
             { key: "tree-himalaya", xFrac: 0.91, yAbove: -18, scale: 1.8, flipX: true, layer: "bg" },
-            // bg — bamboo groves when asset arrives
+            // bg — bamboo groves
             { key: "bamboo", xFrac: 0.15, yAbove: -10, scale: 1.3, layer: "bg" },
             { key: "bamboo", xFrac: 0.82, yAbove: -10, scale: 1.1, flipX: true, layer: "bg" },
             { key: "bamboo", xFrac: 0.28, yAbove: -10, scale: 0.9, layer: "bg" },
-            // fg — jungle bushes (visual contrast against bg bamboo) + flowers
+            // fg — jungle bushes + flowers
             { key: "bg-jungle", xFrac: 0.03, yAbove: -4, scale: 1.1, layer: "fg" },
             { key: "bg-jungle", xFrac: 0.72, yAbove: -4, scale: 0.9, flipX: true, layer: "fg" },
             { key: "bg-jungle", xFrac: 0.96, yAbove: -4, scale: 1.0, layer: "fg" },
@@ -272,55 +286,38 @@ export function PlatformerGame() {
             { key: "flowers-forest", xFrac: 0.86, yAbove: -6, scale: 1.1, layer: "fg" },
           ],
           vines: [
-            { xFrac: 0.35, topAbove: 225 }, // aligned with high platforms — climb+leap
-            { xFrac: 0.65, topAbove: 225 },
+            { xFrac: 0.18, topAbove: 240 },
+            { xFrac: 0.38, topAbove: 190 },
+            { xFrac: 0.62, topAbove: 190 },
+            { xFrac: 0.82, topAbove: 240 },
+          ],
+          signs: [
+            { xFrac: 0.22, modalId: "landing"  },
+            { xFrac: 0.41, modalId: "projects" },
+            { xFrac: 0.59, modalId: "about"    },
+            { xFrac: 0.78, modalId: "reading"  },
           ],
         },
-        { // 1 projects — tech cave
-          bg: 0x0c1d2c, ground: 0x091828, line: 0x0e6080,
-          platformFill: 0x091828, platformEdge: 0x0e8ab0,
-          labelColor: "#0ea8d0", arrowColor: "#0e6080",
+        { // 1 socials — stone temple, warm torchlight
+          bg: 0x1a0e06, ground: 0x2d1e0a, line: 0x7a4010,
+          platformFill: 0x2d1e0a, platformEdge: 0x9a5020,
+          labelColor: "#c8a060", arrowColor: "#7a4010",
+          spawnXFrac: 0.12, spawnYAbove: 20,
           platforms: [
-            { xFrac: 0.20, yAbove: 72,  w: 160 },
-            { xFrac: 0.50, yAbove: 120, w: 160 },
-            { xFrac: 0.80, yAbove: 168, w: 160 },
+            { xFrac: 0.25, yAbove: 90, w: 120 }, // pedestal left  (linkedin)
+            { xFrac: 0.50, yAbove: 90, w: 120 }, // pedestal center (github)
+            { xFrac: 0.75, yAbove: 90, w: 120 }, // pedestal right (email)
+            { xFrac: 0.12, yAbove: 50, w: 80 },  // step left
+            { xFrac: 0.88, yAbove: 50, w: 80 },  // step right
           ],
-          props: [
-            { key: "terminal-tech", xFrac: 0.10, yAbove: 0, layer: "bg" },
-            { key: "terminal-tech", xFrac: 0.88, yAbove: 0, flipX: true, layer: "bg" },
-          ],
+          props: [],
           vines: [],
-        },
-        { // 2 about — warm forest clearing
-          bg: 0x1f1a0d, ground: 0x2a200a, line: 0x7a6030,
-          platformFill: 0x2a200a, platformEdge: 0x9a8040,
-          labelColor: "#a08040", arrowColor: "#7a6030",
-          platforms: [
-            { xFrac: 0.22, yAbove: 150, w: 160 },
-            { xFrac: 0.50, yAbove: 72,  w: 160 },
-            { xFrac: 0.78, yAbove: 150, w: 160 },
+          signs: [],
+          socials: [
+            { xFrac: 0.25, url: "https://www.linkedin.com/in/roger-flores-3113-nu/", label: "LinkedIn" },
+            { xFrac: 0.50, url: "https://github.com/RogerFlores3113",               label: "GitHub"   },
+            { xFrac: 0.75, url: "mailto:rflores3113@gmail.com",                     label: "Email"    },
           ],
-          props: [
-            { key: "tree-forest", xFrac: 0.08, yAbove: 0, scale: 1.4, layer: "bg" },
-            { key: "tree-forest", xFrac: 0.92, yAbove: 0, scale: 1.1, flipX: true, layer: "bg" },
-          ],
-          vines: [],
-        },
-        { // 3 reading — library
-          bg: 0x18101e, ground: 0x1e1428, line: 0x6040a0,
-          platformFill: 0x1e1428, platformEdge: 0x8060c0,
-          labelColor: "#9070d0", arrowColor: "#6040a0",
-          platforms: [
-            { xFrac: 0.20, yAbove: 80, w: 160 },
-            { xFrac: 0.50, yAbove: 80, w: 160 },
-            { xFrac: 0.80, yAbove: 80, w: 160 },
-          ],
-          props: [
-            { key: "bookshelf", xFrac: 0.06, yAbove: 0, scale: 1.2, layer: "bg" },
-            { key: "books-reading", xFrac: 0.88, yAbove: 0, layer: "bg" },
-            { key: "bookshelf", xFrac: 0.94, yAbove: 0, flipX: true, layer: "bg" },
-          ],
-          vines: [],
         },
       ];
 
@@ -328,14 +325,30 @@ export function PlatformerGame() {
       class BaseScene extends Phaser.Scene {
         protected buildAnimations() {
           if (this.anims.exists("Idle")) return; // already built by a prior scene
-          for (const [key, def] of Object.entries(RP_ANIMS)) {
-            this.anims.create({
-              key,
-              frames: Array.from({ length: def.count }, (_, i) => ({ key: `${def.prefix}-${i}` })),
-              frameRate: key === "Idle" ? 8 : 10,
-              repeat: key === "Jump" ? 0 : -1,
-            });
-          }
+          this.anims.create({
+            key: "Idle",
+            frames: Array.from({ length: 8 }, (_, i) => ({ key: `rp2-idle-east-${i}` })),
+            frameRate: 8,
+            repeat: -1,
+          });
+          this.anims.create({
+            key: "Run",
+            frames: Array.from({ length: 8 }, (_, i) => ({ key: `rp2-run-east-${i}` })),
+            frameRate: 10,
+            repeat: -1,
+          });
+          this.anims.create({
+            key: "Jump",
+            frames: Array.from({ length: 8 }, (_, i) => ({ key: `rp2-jump-east-${i}` })),
+            frameRate: 10,
+            repeat: 0,
+          });
+          this.anims.create({
+            key: "ClimbN",
+            frames: Array.from({ length: 4 }, (_, i) => ({ key: `rp2-climb-north-${i}` })),
+            frameRate: 8,
+            repeat: -1,
+          });
         }
       }
 
@@ -353,16 +366,25 @@ export function PlatformerGame() {
         private enterKey!: Phaser.Input.Keyboard.Key;
         private shiftKey!: Phaser.Input.Keyboard.Key;
 
-        private signX = 0;
-        private signHint!: Phaser.GameObjects.Text;
-        private inSignRange = false;
+        // Signs (modals)
+        private signDefs:  Array<{ x: number; modalId: string }> = [];
+        private signHints: Phaser.GameObjects.Text[] = [];
+        private activeSignIdx = -1;
+        // Social statues (room 2)
+        private socialLinks: Array<{ x: number; url: string }> = [];
+        private socialHints: Phaser.GameObjects.Text[] = [];
+        private activeSocial = -1;
+        // State
         private transitioning = false;
         private entryFromLeft = true;
         private platforms!: Phaser.Physics.Arcade.StaticGroup;
+        // Vines
         private vineZones: Phaser.GameObjects.Rectangle[] = [];
-        private onVine = false;
+        private onVine     = false;
         private activeVineX = 0;
-        private mistLayers: Phaser.GameObjects.TileSprite[] = [];
+        private vineDetachTime = 0;  // timestamp ms — cooldown after detaching
+        // Mist (chunky individual sprites)
+        private mistSprites: Array<{ img: Phaser.GameObjects.Image; vx: number }> = [];
 
         private readonly SPEED   = 180;
         private readonly JUMP_VY = -600;
@@ -375,22 +397,43 @@ export function PlatformerGame() {
         }
 
         init(data: Record<string, unknown>) {
-          this.entryFromLeft = (data.fromLeft as boolean) !== false;
-          this.transitioning = false;
-          this.inSignRange   = false;
-          this.mistLayers    = [];
+          this.entryFromLeft  = (data.fromLeft as boolean) !== false;
+          this.transitioning  = false;
+          this.signDefs       = [];
+          this.signHints      = [];
+          this.activeSignIdx  = -1;
+          this.socialLinks    = [];
+          this.socialHints    = [];
+          this.activeSocial   = -1;
+          this.mistSprites    = [];
+          this.onVine         = false;
+          this.vineDetachTime = 0;
         }
 
         preload() {
-          // Load PixelLab east-direction frames for each animation
-          for (const [, def] of Object.entries(RP_ANIMS)) {
-            for (let i = 0; i < def.count; i++) {
-              const key = `${def.prefix}-${i}`;
-              if (!this.textures.exists(key))
-                this.load.image(key, `/sprites/rp/${def.prefix.replace("rp-", "")}-${i}.png`);
-            }
+          // ── New PixelLab sprites ─────────────────────────────────────────────
+          // east frames: idle, run, jump (8 each)
+          const RP_BASE = "/sprites/pixellab_red_panda/animations";
+          for (let i = 0; i < 8; i++) {
+            const f = padN(i);
+            if (!this.textures.exists(`rp2-idle-east-${i}`))
+              this.load.image(`rp2-idle-east-${i}`, `${RP_BASE}/${ANIM_DIRS.idle}/east/frame_${f}.png`);
+            if (!this.textures.exists(`rp2-run-east-${i}`))
+              this.load.image(`rp2-run-east-${i}`,  `${RP_BASE}/${ANIM_DIRS.run}/east/frame_${f}.png`);
+            if (!this.textures.exists(`rp2-jump-east-${i}`))
+              this.load.image(`rp2-jump-east-${i}`, `${RP_BASE}/${ANIM_DIRS.jump}/east/frame_${f}.png`);
           }
-          // Prop textures — load once, skip if already cached
+          // north frames: climb (4)
+          for (let i = 0; i < 4; i++) {
+            if (!this.textures.exists(`rp2-climb-north-${i}`))
+              this.load.image(`rp2-climb-north-${i}`, `${RP_BASE}/${ANIM_DIRS.climb}/north/frame_${padN(i)}.png`);
+          }
+
+          // ── Room 0 background ────────────────────────────────────────────────
+          if (!this.textures.exists("bg-landing"))
+            this.load.image("bg-landing", "/props/pixellab-Misty-asian-jungle-background.png");
+
+          // ── Prop textures — load once, skip if already cached ────────────────
           const propAssets: [string, string][] = [
             ["tree-himalaya",    "/props/tree-himalaya.png"],
             ["bamboo",           "/props/bamboo.png"],
@@ -431,8 +474,15 @@ export function PlatformerGame() {
                 D_FGPROP = 15, D_SIGN = 16, D_UI = 20;
 
           // ── Background ────────────────────────────────────────────────────────
-          // Sky base
-          this.add.rectangle(0, 0, width, height, theme.bg).setOrigin(0, 0).setDepth(D_SKY);
+          if (this.roomIndex === 0 && this.textures.exists("bg-landing")) {
+            // PixelLab misty jungle image fills the sky area
+            this.add.image(width / 2, height / 2, "bg-landing")
+              .setDisplaySize(width, height)
+              .setAlpha(0.80)
+              .setDepth(D_SKY);
+          } else {
+            this.add.rectangle(0, 0, width, height, theme.bg).setOrigin(0, 0).setDepth(D_SKY);
+          }
 
           // Ground — three cross-section layers: grass → dirt → stone
           // Solid backing rects ensure transparent tile PNGs have a base color.
@@ -555,20 +605,8 @@ export function PlatformerGame() {
             this.add.rectangle(0, groundY - 55, width, 65, 0x2a5a14)
               .setOrigin(0, 0).setAlpha(0.16).setDepth(D_BGFX);
 
-            // Ground mist — stored for per-frame scroll in update()
-            if (this.textures.exists("mist-tile")) {
-              const mistDefs: [number, number, number][] = [
-                [groundY - 8,  42, 0.58],
-                [groundY - 34, 32, 0.30],
-                [groundY - 60, 24, 0.15],
-                [groundY - 84, 18, 0.07],
-              ];
-              for (const [my, mh, ma] of mistDefs) {
-                const m = this.add.tileSprite(0, my, width, mh, "mist-tile")
-                  .setOrigin(0, 0).setAlpha(ma).setDepth(D_FGPROP + 0.5);
-                this.mistLayers.push(m);
-              }
-            } else {
+            // Ground mist fallback color bands (chunky sprite mist set up below)
+            if (!this.textures.exists("mist-tile")) {
               const mistBands: [number, number, number][] = [
                 [groundY - 10, 30, 0.20],
                 [groundY - 34, 22, 0.12],
@@ -664,38 +702,116 @@ export function PlatformerGame() {
             this.vineZones.push(zone);
           }
 
-          // ── Sign ──────────────────────────────────────────────────────────────
-          this.signX = Math.round(width / 2);
-          const signBoardY = groundY - 52;
-          if (this.textures.exists("sign-mossy") && this.roomIndex === 0) {
-            // Sprite sign: anchor bottom-center at ground, scale x2 for crispness
-            this.add.image(this.signX, groundY, "sign-mossy")
-              .setOrigin(0.5, 1).setScale(2).setDepth(D_SIGN);
-            // "ENT" prompt text overlaid on board area (2× scale sign board ≈ 128×160)
-            this.add.text(this.signX, groundY - 96, "ENT", {
-              fontFamily: "monospace", fontSize: "13px", color: "#d4c8a0",
-            }).setOrigin(0.5).setDepth(D_SIGN);
-          } else {
-            // Fallback: procedural brown rectangles for rooms without sprite sign
-            this.add.rectangle(this.signX, groundY - 18, 5, 34, 0x4a2a0a).setDepth(D_SIGN);
-            this.add.rectangle(this.signX, signBoardY, 78, 36, 0x7a4e22)
-              .setStrokeStyle(2, 0xb07840).setDepth(D_SIGN);
-            this.add.rectangle(this.signX, signBoardY, 70, 28, 0x8f5e2a).setDepth(D_SIGN);
-            this.add.text(this.signX, signBoardY, "ENT", {
-              fontFamily: "monospace", fontSize: "11px", color: "#d4a06a",
-            }).setOrigin(0.5).setDepth(D_SIGN);
+          // ── Signs (modal triggers) ────────────────────────────────────────────
+          this.signDefs  = [];
+          this.signHints = [];
+          for (const sd of theme.signs) {
+            const sx = Math.round(sd.xFrac * width);
+            this.signDefs.push({ x: sx, modalId: sd.modalId });
+            const boardY = groundY - 52;
+            if (this.textures.exists("sign-mossy")) {
+              this.add.image(sx, groundY, "sign-mossy")
+                .setOrigin(0.5, 1).setScale(2).setDepth(D_SIGN);
+              this.add.text(sx, groundY - 96, "ENT", {
+                fontFamily: "monospace", fontSize: "13px", color: "#d4c8a0",
+              }).setOrigin(0.5).setDepth(D_SIGN);
+            } else {
+              this.add.rectangle(sx, groundY - 18, 5, 34, 0x4a2a0a).setDepth(D_SIGN);
+              this.add.rectangle(sx, boardY, 90, 36, 0x7a4e22)
+                .setStrokeStyle(2, 0xb07840).setDepth(D_SIGN);
+              this.add.rectangle(sx, boardY, 82, 28, 0x8f5e2a).setDepth(D_SIGN);
+              this.add.text(sx, boardY, "ENT", {
+                fontFamily: "monospace", fontSize: "11px", color: "#d4a06a",
+              }).setOrigin(0.5).setDepth(D_SIGN);
+            }
+            const hint = this.add.text(sx, boardY - 24, "[ ENTER ]", {
+              fontFamily: "monospace", fontSize: "9px", color: "#c8905a",
+            }).setOrigin(0.5).setAlpha(0).setDepth(D_UI);
+            this.signHints.push(hint);
           }
-          this.signHint = this.add.text(this.signX, signBoardY - 24, "press ENTER", {
-            fontFamily: "monospace", fontSize: "9px", color: "#c8905a",
-          }).setOrigin(0.5).setAlpha(0).setVisible(false).setDepth(D_UI);
+
+          // ── Social statues (room 1) ───────────────────────────────────────────
+          this.socialLinks  = [];
+          this.socialHints  = [];
+          if (theme.socials) {
+            for (const soc of theme.socials) {
+              const sx = Math.round(soc.xFrac * width);
+              this.socialLinks.push({ x: sx, url: soc.url });
+              // Placeholder pillar (stone column until PixelLab statue assets arrive)
+              this.add.rectangle(sx, groundY, 28, 80, 0x5a3c1e)
+                .setOrigin(0.5, 1).setDepth(D_FGPROP);
+              this.add.rectangle(sx, groundY - 80, 40, 14, 0x8a6030)
+                .setOrigin(0.5, 1).setDepth(D_FGPROP);
+              // Warm flicker glow behind each torch
+              const glow = this.add.circle(sx, groundY - 100, 16, 0xff8820, 0.25)
+                .setDepth(D_BGFX);
+              this.tweens.add({
+                targets: glow,
+                alpha: { from: 0.18, to: 0.35 },
+                scaleX: { from: 0.9, to: 1.1 },
+                scaleY: { from: 0.9, to: 1.1 },
+                duration: 600 + Math.random() * 400,
+                ease: "Sine.easeInOut",
+                yoyo: true,
+                repeat: -1,
+              });
+              // Label
+              this.add.text(sx, groundY - 100, soc.label, {
+                fontFamily: "monospace", fontSize: "9px", color: "#c8a060",
+              }).setOrigin(0.5).setDepth(D_SIGN);
+              // Proximity hint (initially hidden)
+              const hint = this.add.text(sx, groundY - 115, "[ ENTER ]", {
+                fontFamily: "monospace", fontSize: "9px", color: "#ffa040",
+              }).setOrigin(0.5).setAlpha(0).setDepth(D_UI);
+              this.socialHints.push(hint);
+            }
+          }
+
+          // ── Stone temple atmosphere (room 1) ──────────────────────────────────
+          if (this.roomIndex === 1) {
+            // Warm vignette bands at top
+            const tempBands: [number, number, number, number][] = [
+              [0,            height * 0.15, 0x0f0602, 0.70],
+              [height * 0.1, height * 0.35, 0x1a0d05, 0.50],
+              [height * 0.4, height * 0.30, 0x2a1a08, 0.25],
+            ];
+            for (const [y, h, col, a] of tempBands) {
+              this.add.rectangle(0, y, width, h, col).setOrigin(0, 0).setAlpha(a).setDepth(D_BGFX);
+            }
+            // Stone column silhouettes
+            const colX = [0.05, 0.15, 0.85, 0.95];
+            for (const cx of colX) {
+              this.add.rectangle(Math.round(cx * width), groundY, 18, height * 0.6, 0x2e1e0a)
+                .setOrigin(0.5, 1).setAlpha(0.7).setDepth(D_BGFX);
+            }
+          }
+
+          // ── Chunky mist sprites (room 0) ─────────────────────────────────────
+          this.mistSprites = [];
+          if (this.roomIndex === 0 && this.textures.exists("mist-tile")) {
+            const mistCount = 5 + Math.floor(Math.random() * 3); // 5-7
+            for (let m = 0; m < mistCount; m++) {
+              const mx    = Math.random() * width;
+              const my    = groundY - 15 - Math.random() * 70;
+              const scale = 1.0 + Math.random() * 2.2;
+              const alpha = 0.13 + Math.random() * 0.22;
+              const angle = Math.random() * 360;
+              const img   = this.add.image(mx, my, "mist-tile")
+                .setScale(scale)
+                .setAlpha(alpha)
+                .setAngle(angle)
+                .setDepth(D_BGFX + 0.5);
+              const vx = (22 + Math.random() * 28) * (Math.random() > 0.5 ? 1 : -1);
+              this.mistSprites.push({ img, vx });
+            }
+          }
 
           // ── Player ────────────────────────────────────────────────────────────
           const startX = theme.spawnXFrac !== undefined
             ? Math.round(theme.spawnXFrac * width)
             : (this.entryFromLeft ? 80 : width - 80);
           const startY = groundY - (theme.spawnYAbove ?? 32);
-          // 48×48 canvas, character ~28px tall / ~22px wide, rendered at 2×
-          this.player = this.physics.add.sprite(startX, startY, "rp-idle-0")
+          this.player = this.physics.add.sprite(startX, startY, "rp2-idle-east-0")
             .setScale(2).setDepth(D_PLAYER);
           (this.player.body as Phaser.Physics.Arcade.Body)
             .setSize(22, 28)
@@ -774,50 +890,52 @@ export function PlatformerGame() {
           const speed = sprint ? this.SPEED * 1.75 : this.SPEED;
 
           // ── Vine logic ─────────────────────────────────────────────────────────
-          // Detect if player is touching any vine zone
           let touchingVine = false;
-          let nearVineX = 0;
           const pb = this.player.getBounds();
           for (const zone of this.vineZones) {
             const zb = zone.getBounds();
             if (Phaser.Geom.Intersects.RectangleToRectangle(pb, zb)) {
               touchingVine = true;
-              nearVineX = zone.x;
+              this.activeVineX = zone.x;
               break;
             }
           }
 
-          // Grab vine when touching it and pressing up (or already holding)
-          if (touchingVine && (up || this.onVine)) {
+          // Grab: touching vine, pressing up, and cooldown elapsed (prevents instant re-grab after jump)
+          const canGrab = touchingVine && Date.now() - this.vineDetachTime > 400;
+          if (canGrab && up && !this.onVine) {
             this.onVine = true;
           }
-          if (!touchingVine) {
+          // Drop: physically left the vine zone
+          if (this.onVine && !touchingVine) {
             this.onVine = false;
+            body.allowGravity = true;
           }
 
           if (this.onVine) {
             body.allowGravity = false;
-            this.player.x = nearVineX; // snap to vine center
-            body.setVelocityX(0);
-            if (up)        body.setVelocityY(-100);
-            else if (down) body.setVelocityY(90);
+            // Soft X centering — pulls toward vine without hard-snapping (fixes the lockup)
+            body.setVelocityX((this.activeVineX - this.player.x) * 10);
+
+            if (up)        body.setVelocityY(-120);
+            else if (down) body.setVelocityY(100);
             else           body.setVelocityY(0);
 
-            // Jump/horizontal = leap off vine
-            if (jumpPressed || left || right) {
-              this.onVine = false;
-              body.allowGravity = true;
-              if (jumpPressed) {
-                body.setVelocityY(this.JUMP_VY * 0.8);
-                body.setVelocityX(this.player.flipX ? -speed : speed);
-              }
+            // Jump off vine: give upward + directional velocity, set cooldown
+            if (jumpPressed) {
+              this.onVine          = false;
+              this.vineDetachTime  = Date.now();
+              body.allowGravity    = true;
+              body.setVelocityY(this.JUMP_VY * 0.85);
+              const dir = left ? -1 : right ? 1 : (this.player.flipX ? -1 : 1);
+              body.setVelocityX(dir * speed);
+            } else {
+              // ClimbN animation (north-facing frames, no flipX)
+              const anim = this.player.anims.currentAnim?.key;
+              if (up || down) { if (anim !== "ClimbN") { this.player.play("ClimbN", true); this.player.setFlipX(false); } }
+              else            { if (anim !== "Idle")   this.player.play("Idle", true); }
+              return; // vine handles movement; skip normal update
             }
-
-            // Animation while on vine
-            const anim = this.player.anims.currentAnim?.key;
-            if (up || down) { if (anim !== "Movement") this.player.play("Movement", true); }
-            else            { if (anim !== "Idle")     this.player.play("Idle", true); }
-            return; // skip normal movement logic when on vine
           } else {
             body.allowGravity = true;
           }
@@ -834,29 +952,58 @@ export function PlatformerGame() {
           if (!onGround) {
             if (anim !== "Jump") this.player.play("Jump", true);
           } else if (left || right) {
-            if (anim !== "Movement") this.player.play("Movement", true);
+            if (anim !== "Run")  this.player.play("Run", true);
           } else {
             if (anim !== "Idle") this.player.play("Idle", true);
           }
 
-          // Mist drift (jungle room only)
-          for (const m of this.mistLayers) m.tilePositionX -= 0.18;
-
-          // Sign proximity
-          const dist = Math.abs(this.player.x - this.signX);
-          const near = dist < 64;
-          if (near !== this.inSignRange) {
-            this.inSignRange = near;
-            this.signHint.setVisible(near);
-            this.tweens.add({
-              targets: this.signHint,
-              alpha: near ? 1 : 0,
-              duration: 150,
-            });
+          // Mist drift (chunky individual images)
+          const dt = this.game.loop.delta / 1000;
+          for (const ms of this.mistSprites) {
+            ms.img.x += ms.vx * dt;
+            if (ms.vx > 0 && ms.img.x > width + 100) ms.img.x = -100;
+            if (ms.vx < 0 && ms.img.x < -100)        ms.img.x = width + 100;
           }
-          if (near && Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+
+          // ── Sign proximity (modal triggers) ────────────────────────────────────
+          let nearSignIdx = -1;
+          for (let i = 0; i < this.signDefs.length; i++) {
+            if (Math.abs(this.player.x - this.signDefs[i].x) < 64) {
+              nearSignIdx = i;
+              break;
+            }
+          }
+          if (nearSignIdx !== this.activeSignIdx) {
+            if (this.activeSignIdx >= 0)
+              this.tweens.add({ targets: this.signHints[this.activeSignIdx], alpha: 0, duration: 150 });
+            if (nearSignIdx >= 0)
+              this.tweens.add({ targets: this.signHints[nearSignIdx], alpha: 1, duration: 150 });
+            this.activeSignIdx = nearSignIdx;
+          }
+          if (nearSignIdx >= 0 && Phaser.Input.Keyboard.JustDown(this.enterKey)) {
             window.dispatchEvent(new CustomEvent("open-modal", {
-              detail: { modalId: ROOMS[this.roomIndex].modalId },
+              detail: { modalId: this.signDefs[nearSignIdx].modalId },
+            }));
+          }
+
+          // ── Social proximity (link triggers) ───────────────────────────────────
+          let nearSocialIdx = -1;
+          for (let i = 0; i < this.socialLinks.length; i++) {
+            if (Math.abs(this.player.x - this.socialLinks[i].x) < 64) {
+              nearSocialIdx = i;
+              break;
+            }
+          }
+          if (nearSocialIdx !== this.activeSocial) {
+            if (this.activeSocial >= 0)
+              this.tweens.add({ targets: this.socialHints[this.activeSocial], alpha: 0, duration: 150 });
+            if (nearSocialIdx >= 0)
+              this.tweens.add({ targets: this.socialHints[nearSocialIdx], alpha: 1, duration: 150 });
+            this.activeSocial = nearSocialIdx;
+          }
+          if (nearSocialIdx >= 0 && Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+            window.dispatchEvent(new CustomEvent("open-social", {
+              detail: { url: this.socialLinks[nearSocialIdx].url },
             }));
           }
 
@@ -885,16 +1032,14 @@ export function PlatformerGame() {
         }
       }
 
-      // ── 4 room scenes ─────────────────────────────────────────────────────────
-      class LandingScene  extends RoomScene { constructor() { super({ key: "landing"  }, 0); } }
-      class ProjectsScene extends RoomScene { constructor() { super({ key: "projects" }, 1); } }
-      class AboutScene    extends RoomScene { constructor() { super({ key: "about"    }, 2); } }
-      class ReadingScene  extends RoomScene { constructor() { super({ key: "reading"  }, 3); } }
+      // ── 2 room scenes ─────────────────────────────────────────────────────────
+      class LandingScene  extends RoomScene { constructor() { super({ key: "landing" }, 0); } }
+      class SocialsScene  extends RoomScene { constructor() { super({ key: "socials" }, 1); } }
 
       const game = new Phaser.Game({
         type: Phaser.AUTO,
         parent: containerRef.current!,
-        backgroundColor: "#1a2e1a",
+        backgroundColor: "#0a1e10",
         pixelArt: true,
         scale: {
           mode: Phaser.Scale.RESIZE,
@@ -904,7 +1049,7 @@ export function PlatformerGame() {
           default: "arcade",
           arcade: { gravity: { x: 0, y: 2000 }, debug: false },
         },
-        scene: [LandingScene, ProjectsScene, AboutScene, ReadingScene],
+        scene: [LandingScene, SocialsScene],
       });
 
       gameRef.current = game;

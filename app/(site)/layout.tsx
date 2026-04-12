@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PandaWalker } from "@/app/components/PandaWalker";
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -69,6 +70,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       </nav>
       {children}
       <Footer />
+      <PandaWalker />
     </>
   );
 }
