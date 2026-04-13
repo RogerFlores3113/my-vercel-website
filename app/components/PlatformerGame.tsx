@@ -535,47 +535,6 @@ export function PlatformerGame() {
             groundY + grassH + dirtH, stoneH,
             ["stone-dirt-fill","stone-dirt-fill-r90","stone-dirt-fill-r180","stone-dirt-fill-r270"]
           );
-          // Ground surface line
-          this.add.rectangle(0, groundY, width, 2, theme.line).setOrigin(0, 0).setDepth(D_GROUND + 0.1);
-
-          // ── Room-specific atmosphere ───────────────────────────────────────────
-          if (this.roomIndex === 0) {
-            // ── Bamboo forest atmosphere ──────────────────────────────────────────
-
-            // Bamboo leaf cap graphics (reused per stalk below)
-            const canopyGfx = this.add.graphics().setDepth(D_BGFX);
-
-            // Bamboo silhouettes — bottom-anchored so rotation = natural base-sway
-            const bamPos = [0.05, 0.11, 0.18, 0.60, 0.68, 0.76, 0.84, 0.90, 0.96];
-            const bamH   = [310, 255, 285, 265, 215, 295, 235, 275, 225];
-            const bamW   = [8, 6, 9, 7, 6, 10, 7, 8, 6];
-            const bamCol = [0x0b2410, 0x0c2612, 0x091e0d, 0x0b2410, 0x0a2210,
-                            0x0c2612, 0x091e0d, 0x0b2410, 0x0a1e0d];
-            const bamStalks: Phaser.GameObjects.Rectangle[] = [];
-            for (let i = 0; i < bamPos.length; i++) {
-              const bx = Math.round(bamPos[i] * width);
-              const stalk = this.add.rectangle(bx, groundY, bamW[i], bamH[i], bamCol[i])
-                .setOrigin(0.5, 1).setDepth(D_BGFX);
-              bamStalks.push(stalk);
-              // Leaf burst cap at stalk top
-              canopyGfx.fillStyle(0x0e2e14, 0.65);
-              canopyGfx.fillEllipse(bx, groundY - bamH[i], bamW[i] * 4.5, bamH[i] * 0.10);
-            }
-            // Staggered wind sway on each stalk
-            bamStalks.forEach((stalk, i) => {
-              const swing = 1.0 + (i % 4) * 0.5;
-              this.tweens.add({
-                targets: stalk,
-                angle: swing * (i % 2 === 0 ? 1 : -1),
-                duration: 1700 + i * 230,
-                ease: "Sine.easeInOut",
-                yoyo: true,
-                repeat: -1,
-                delay: i * 170,
-              });
-            });
-
-          }
 
           // ── Background props (trees, terminals, shelves — behind player) ───────
           for (const prop of theme.props.filter(p => (p.layer ?? "bg") === "bg")) {
@@ -639,8 +598,8 @@ export function PlatformerGame() {
             this.platforms.add(body);
             if (useWoodTile) {
               // Wood tile tileSprite — setTileScale(0.5, 0.875) makes tiles denser horizontally
-              const ts = this.add.tileSprite(px - def.w / 2, py - PLAT_H / 2, def.w, PLAT_H, "platform-wood")
-                .setOrigin(0, 0.5).setDepth(D_PLATFORM);
+              const ts = this.add.tileSprite(px, py, def.w, PLAT_H, "platform-wood")
+                .setOrigin(0.5, 0.5).setDepth(D_PLATFORM);
               ts.setTileScale(0.5, PLAT_H / 32); // 0.5x width = denser, fit height exactly
             } else {
               this.add.rectangle(px, py - PLAT_H / 2 + 1, def.w, 2, theme.platformEdge).setDepth(D_PLATFORM);
