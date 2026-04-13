@@ -465,6 +465,7 @@ export function PlatformerGame() {
             ["vine-tile",        "/props/vine-tile.png"],
             ["sign-mossy",       "/props/sign-mossy.png"],
             ["sign-jungle",      "/props/sign-jungle.png"],
+            ["sign-bamboo",      "/props/sign-bamboo.png"],
             ["sign-lantern",     "/props/sign-lantern.png"],
             ["fern-cluster",     "/props/fern-cluster.png"],
             ["mushrooms",        "/props/mushrooms.png"],
@@ -474,6 +475,7 @@ export function PlatformerGame() {
             ["statue-github",    "/props/statue-github.png"],
             ["statue-email",     "/props/statue-email.png"],
             ["grass-tile",           "/props/grass-tile.png"],
+            ["platform-wood",        "/props/platform-wood.png"],
             ["grass-dirt-fill",      "/props/grass-dirt-fill.png"],
             ["grass-dirt-fill-r90",  "/props/grass-dirt-fill_r90.png"],
             ["grass-dirt-fill-r180", "/props/grass-dirt-fill_r180.png"],
@@ -676,13 +678,23 @@ export function PlatformerGame() {
 
           // ── Floating platforms ─────────────────────────────────────────────────
           this.platforms = this.physics.add.staticGroup();
+          const useWoodTile = this.textures.exists("platform-wood");
           for (const def of theme.platforms) {
             const px = Math.round(def.xFrac * width);
             const py = groundY - def.yAbove;
-            const body = this.add.rectangle(px, py, def.w, 16, theme.platformFill).setDepth(D_PLATFORM);
+            // Invisible physics body (rectangle — always needed)
+            const body = this.add.rectangle(px, py, def.w, 16, theme.platformFill, useWoodTile ? 0 : 1)
+              .setDepth(D_PLATFORM);
             this.physics.add.existing(body, true);
             this.platforms.add(body);
-            this.add.rectangle(px, py - 7, def.w, 2, theme.platformEdge).setDepth(D_PLATFORM);
+            if (useWoodTile) {
+              // Wood tile tileSprite on top
+              this.add.tileSprite(px - def.w / 2, py - 8, def.w, 16, "platform-wood")
+                .setOrigin(0, 0).setDepth(D_PLATFORM);
+            } else {
+              // Fallback colored edge line
+              this.add.rectangle(px, py - 7, def.w, 2, theme.platformEdge).setDepth(D_PLATFORM);
+            }
           }
 
           // ── Vines ─────────────────────────────────────────────────────────────
@@ -711,7 +723,7 @@ export function PlatformerGame() {
 
           // ── Signs (modal triggers) ────────────────────────────────────────────
           // Rotate through available sign variants for variety
-          const SIGN_KEYS  = ["sign-jungle", "sign-lantern", "sign-mossy"];
+          const SIGN_KEYS  = ["sign-jungle", "sign-bamboo", "sign-lantern", "sign-mossy"];
           const SIGN_NAMES: Record<string, string> = {
             landing: "About Me", projects: "Projects", about: "Now", reading: "Reading",
           };
@@ -720,6 +732,7 @@ export function PlatformerGame() {
           // Transparent bottom padding per sign (px at scale 1); used to sink image so it sits flush
           const SIGN_SINK: Record<string, number> = {
             "sign-jungle":  6,   // 3px transparent * scale 2
+            "sign-bamboo":  6,   // ~3px transparent * scale 2
             "sign-lantern": 12,  // 6px transparent * scale 2
             "sign-mossy":   6,   // ~3px transparent * scale 2
           };
