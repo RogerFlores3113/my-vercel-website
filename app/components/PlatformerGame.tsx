@@ -529,10 +529,10 @@ export function PlatformerGame() {
           };
           if (this.textures.exists("grass-tile"))
             this.add.tileSprite(0, groundY, width, grassH, "grass-tile").setOrigin(0,0).setDepth(D_GROUND);
-          // Thin grass edge in front of all props/player — hides sprite feet at ground line
+          // Thin grass edge — must be in FRONT of everything (props, player, signs)
           if (this.textures.exists("grass-tile"))
             this.add.tileSprite(0, groundY, width, 12, "grass-tile")
-              .setOrigin(0, 0).setDepth(D_UI - 1);
+              .setOrigin(0, 0).setDepth(D_MIST - 1);
           addTileLayers(
             groundY + grassH, dirtH,
             ["grass-dirt-fill","grass-dirt-fill-r90","grass-dirt-fill-r180","grass-dirt-fill-r270"]
@@ -621,7 +621,7 @@ export function PlatformerGame() {
 
           // Instructions — room 0 only, top-center
           if (this.roomIndex === 0) {
-            this.add.text(width / 2, 18, "WASD / Arrow Keys to move   ·   ESC for boring-mode", {
+            this.add.text(width / 2, 18, "WASD / Arrow Keys to move   ·   ESC for portfolio", {
               fontFamily: "Arial, Helvetica, sans-serif",
               fontStyle: "bold",
               fontSize: "16px",
@@ -632,10 +632,21 @@ export function PlatformerGame() {
           }
 
           // Exit arrows
-          if (this.roomIndex < ROOMS.length - 1)
+          if (this.roomIndex < ROOMS.length - 1) {
             this.add.text(width - 18, groundY - 20, "›", {
               fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "20px", color: theme.arrowColor,
             }).setAlpha(0.5).setDepth(D_UI);
+            // "Socials →" label at top-right pointing to next room (room 0 only)
+            if (this.roomIndex === 0)
+              this.add.text(width - 14, 14, "Socials →", {
+                fontFamily: "Arial, Helvetica, sans-serif",
+                fontStyle: "bold",
+                fontSize: "14px",
+                color: "#ffffff",
+                stroke: "#000000",
+                strokeThickness: 2,
+              }).setOrigin(1, 0).setAlpha(0.85).setDepth(D_UI);
+          }
           if (this.roomIndex > 0)
             this.add.text(10, groundY - 20, "‹", {
               fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "20px", color: theme.arrowColor,
@@ -746,6 +757,8 @@ export function PlatformerGame() {
                 fontStyle: "bold",
                 fontSize: "13px",
                 color: labelColor,
+                stroke: "#ffffff",
+                strokeThickness: 1,
               }).setOrigin(0.5).setDepth(D_SIGN + 0.1);
             } else {
               this.add.rectangle(sx, groundY - 18, 5, 34, 0x4a2a0a).setDepth(D_SIGN);
