@@ -165,7 +165,7 @@ function Modal({ modalId, onClose }: { modalId: string; onClose: () => void }) {
           width: "90%",
           maxHeight: "80vh",
           overflowY: "auto",
-          fontFamily: "monospace",
+          fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif",
           color: "#a8a69e",
         }}
       >
@@ -252,7 +252,7 @@ export function PlatformerGame() {
           bg: 0x0a1e10, ground: 0x12280e, line: 0x2a5418,
           platformFill: 0x0d2010, platformEdge: 0x4a8c28,
           labelColor: "#4a8c28", arrowColor: "#4a8c28",
-          spawnXFrac: 0.50, spawnYAbove: 40,
+          spawnXFrac: 0.08, spawnYAbove: 40,
           platforms: [
             // Lower tier — direct jump from ground (~72px)
             { xFrac: 0.15, yAbove: 72,  w: 130 },
@@ -499,8 +499,10 @@ export function PlatformerGame() {
           const grassH = 32;
           const dirtH  = 64;
           const stoneH = Math.max(32, totalGroundH - grassH - dirtH);
-          // Backings
-          this.add.rectangle(0, groundY,                   width, grassH, 0x3a7a18).setOrigin(0, 0).setDepth(D_GROUND - 0.1);
+          // Backings — skip grass backing for room 0 (forest bg shows through fine)
+          const hasBgImage = this.roomIndex === 0 && this.textures.exists("bg-forest");
+          if (!hasBgImage)
+            this.add.rectangle(0, groundY, width, grassH, 0x3a7a18).setOrigin(0, 0).setDepth(D_GROUND - 0.1);
           this.add.rectangle(0, groundY + grassH,          width, dirtH,  0x6b3a1a).setOrigin(0, 0).setDepth(D_GROUND - 0.1);
           this.add.rectangle(0, groundY + grassH + dirtH,  width, stoneH, 0x2e2e2e).setOrigin(0, 0).setDepth(D_GROUND - 0.1);
           // Tiles on top of backings — 4 rotations layered at offsets to kill gaps + add variety
@@ -573,18 +575,6 @@ export function PlatformerGame() {
               });
             });
 
-            // Ground mist fallback color bands (chunky sprite mist set up below)
-            if (!this.textures.exists("mist-tile")) {
-              const mistBands: [number, number, number][] = [
-                [groundY - 10, 30, 0.20],
-                [groundY - 34, 22, 0.12],
-                [groundY - 58, 16, 0.06],
-              ];
-              for (const [my, mh, ma] of mistBands) {
-                this.add.rectangle(0, my, width, mh, 0xc0e8d0)
-                  .setOrigin(0, 0).setAlpha(ma).setDepth(D_BGFX + 0.5);
-              }
-            }
           }
 
           // ── Background props (trees, terminals, shelves — behind player) ───────
@@ -614,17 +604,17 @@ export function PlatformerGame() {
           // Room label (top-left breadcrumb)
           const label = this.roomIndex === 0 ? "~/" : `~/${ROOMS[this.roomIndex].key}`;
           this.add.text(14, 10, label, {
-            fontFamily: "monospace", fontSize: "11px", color: theme.labelColor,
+            fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "14px", color: theme.labelColor,
           }).setAlpha(0.7).setDepth(D_UI);
 
           // Exit arrows
           if (this.roomIndex < ROOMS.length - 1)
             this.add.text(width - 18, groundY - 20, "›", {
-              fontFamily: "monospace", fontSize: "16px", color: theme.arrowColor,
+              fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "20px", color: theme.arrowColor,
             }).setAlpha(0.5).setDepth(D_UI);
           if (this.roomIndex > 0)
             this.add.text(10, groundY - 20, "‹", {
-              fontFamily: "monospace", fontSize: "16px", color: theme.arrowColor,
+              fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "20px", color: theme.arrowColor,
             }).setAlpha(0.5).setDepth(D_UI);
 
           // ── Animations ────────────────────────────────────────────────────────
@@ -657,33 +647,14 @@ export function PlatformerGame() {
             }
           }
 
-          // ── Connecting rope — tan line through all platforms, behind wood sprites ─
-          if (theme.platforms.length > 1) {
+          // ── Rope stripe — tan horizontal bar inside each platform, behind wood ──
+          {
             const ropeGfx = this.add.graphics().setDepth(D_PLATFORM - 0.5);
-            // Sort platforms by x position
-            const sortedPlats = [...theme.platforms].sort((a, b) => a.xFrac - b.xFrac);
-            for (let pi = 0; pi < sortedPlats.length - 1; pi++) {
-              const p1 = sortedPlats[pi];
-              const p2 = sortedPlats[pi + 1];
-              const x1 = Math.round(p1.xFrac * width) + p1.w / 2;
-              const x2 = Math.round(p2.xFrac * width) - p2.w / 2;
-              const y1 = groundY - p1.yAbove;
-              const y2 = groundY - p2.yAbove;
-              const dist = Math.abs(x2 - x1);
-              const sag  = dist * 0.07;
-              const midX = (x1 + x2) / 2;
-              const ctrlY = Math.max(y1, y2) + sag;
-              // Draw quadratic bezier manually (Phaser Graphics has no built-in method)
-              ropeGfx.lineStyle(2, 0xc8a060, 0.90);
-              ropeGfx.beginPath();
-              const STEPS = 16;
-              for (let t = 0; t <= STEPS; t++) {
-                const u = t / STEPS;
-                const bx = (1-u)*(1-u)*x1 + 2*(1-u)*u*midX + u*u*x2;
-                const by = (1-u)*(1-u)*y1 + 2*(1-u)*u*ctrlY + u*u*y2;
-                if (t === 0) ropeGfx.moveTo(bx, by); else ropeGfx.lineTo(bx, by);
-              }
-              ropeGfx.strokePath();
+            ropeGfx.fillStyle(0xc8a060, 0.85);
+            for (const def of theme.platforms) {
+              const px = Math.round(def.xFrac * width);
+              const py = groundY - def.yAbove;
+              ropeGfx.fillRect(px - def.w / 2, py - 2, def.w, 3);
             }
           }
 
@@ -720,7 +691,7 @@ export function PlatformerGame() {
               // Label on board
               const label = SIGN_NAMES[sd.modalId] ?? "ENT";
               this.add.text(sx, groundY - 88, label, {
-                fontFamily: "monospace", fontSize: "10px", color: "#d4c8a0",
+                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "13px", color: "#d4c8a0",
               }).setOrigin(0.5).setDepth(D_SIGN + 0.1);
             } else {
               this.add.rectangle(sx, groundY - 18, 5, 34, 0x4a2a0a).setDepth(D_SIGN);
@@ -728,11 +699,11 @@ export function PlatformerGame() {
                 .setStrokeStyle(2, 0xb07840).setDepth(D_SIGN);
               this.add.rectangle(sx, boardY, 82, 28, 0x8f5e2a).setDepth(D_SIGN);
               this.add.text(sx, boardY, SIGN_NAMES[sd.modalId] ?? "ENT", {
-                fontFamily: "monospace", fontSize: "10px", color: "#d4a06a",
+                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "13px", color: "#d4a06a",
               }).setOrigin(0.5).setDepth(D_SIGN);
             }
             const hint = this.add.text(sx, boardY - 24, "[ ENTER ]", {
-              fontFamily: "monospace", fontSize: "9px", color: "#c8905a",
+              fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "12px", color: "#c8905a",
             }).setOrigin(0.5).setAlpha(0).setDepth(D_UI);
             this.signHints.push(hint);
           }
@@ -775,11 +746,11 @@ export function PlatformerGame() {
               });
               // Label
               this.add.text(sx, groundY - 100, soc.label, {
-                fontFamily: "monospace", fontSize: "9px", color: "#c8a060",
+                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "12px", color: "#c8a060",
               }).setOrigin(0.5).setDepth(D_SIGN);
               // Proximity hint (initially hidden)
               const hint = this.add.text(sx, groundY - 115, "[ ENTER ]", {
-                fontFamily: "monospace", fontSize: "9px", color: "#ffa040",
+                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "12px", color: "#ffa040",
               }).setOrigin(0.5).setAlpha(0).setDepth(D_UI);
               this.socialHints.push(hint);
             }
@@ -815,10 +786,11 @@ export function PlatformerGame() {
               for (let m = 0; m < mistCount; m++) {
                 const key   = mistKeys[m % mistKeys.length];
                 const mx    = Math.random() * width;
-                const my    = groundY - 15 - Math.random() * 70;
+                // Spread across top 40% of scene as clouds
+                const my    = height * 0.04 + Math.random() * height * 0.36;
                 const scale = 1.0 + Math.random() * 2.2;
-                const alpha = 0.10 + Math.random() * 0.20;
-                const angle = Math.random() * 30 - 15; // gentle tilt, not full rotation
+                const alpha = 0.12 + Math.random() * 0.22;
+                const angle = Math.random() * 20 - 10; // gentle tilt
                 const img   = this.add.image(mx, my, key)
                   .setScale(scale)
                   .setAlpha(alpha)
