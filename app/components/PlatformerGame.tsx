@@ -252,19 +252,19 @@ export function PlatformerGame() {
           bg: 0x0a1e10, ground: 0x12280e, line: 0x2a5418,
           platformFill: 0x0d2010, platformEdge: 0x4a8c28,
           labelColor: "#4a8c28", arrowColor: "#4a8c28",
-          spawnXFrac: 0.08, spawnYAbove: 40,
+          spawnXFrac: 0.50, spawnYAbove: 230,
           platforms: [
-            // Lower tier — direct jump from ground (~72px)
+            // Lower tier — outer two flank the signs, inner two raised above signs
             { xFrac: 0.15, yAbove: 72,  w: 130 },
-            { xFrac: 0.38, yAbove: 72,  w: 110 },
-            { xFrac: 0.62, yAbove: 72,  w: 110 },
+            { xFrac: 0.38, yAbove: 150, w: 110 },
+            { xFrac: 0.62, yAbove: 150, w: 110 },
             { xFrac: 0.85, yAbove: 72,  w: 130 },
-            // Middle tier — hop from lower (~145px)
+            // Middle tier
             { xFrac: 0.28, yAbove: 145, w: 120 },
             { xFrac: 0.72, yAbove: 145, w: 120 },
-            // Upper tier — vine-assisted (~210px)
+            // Upper tier — center platform, panda spawns here
             { xFrac: 0.50, yAbove: 210, w: 140 },
-            // Top platform (~275px)
+            // Top platform
             { xFrac: 0.50, yAbove: 275, w: 100 },
           ],
           props: [], // generated dynamically in create() based on scene width
@@ -539,7 +539,7 @@ export function PlatformerGame() {
             const anchors: PropDef[] = [
               // Tall fir tree centred in the scene (falls back to tree-himalaya if not loaded yet)
               this.textures.exists("fir-tree")
-                ? { key: "fir-tree",      xFrac: 0.50, yAbove: -30, scale: 3.5,  layer: "bg" }
+                ? { key: "fir-tree",      xFrac: 0.50, yAbove: -75, scale: 3.5,  layer: "bg" }
                 : { key: "tree-himalaya", xFrac: 0.50, yAbove: -23, scale: 2.0,  layer: "bg" },
               // Bamboo groves at the far sides
               { key: "bamboo", xFrac: 0.10, yAbove: -27, scale: 1.3, layer: "bg" },
@@ -575,13 +575,13 @@ export function PlatformerGame() {
               prop.key
             ).setOrigin(0.5, 1).setScale(prop.scale ?? 1).setDepth(D_BGPROP);
             if (prop.flipX) img.setFlipX(true);
-            // Gentle wind sway for jungle room — bamboo sways more, trees less
-            if (this.roomIndex === 0) {
-              const swing = prop.key === "bamboo" ? 2.2 : 1.3;
+            // Wind sway: only bamboo and the main tree sway
+            if (this.roomIndex === 0 && (prop.key === "bamboo" || prop.key === "fir-tree")) {
+              const swing = prop.key === "bamboo" ? 2.2 : 1.0;
               this.tweens.add({
                 targets: img,
                 angle: swing * (Math.random() > 0.5 ? 1 : -1),
-                duration: 1900 + Math.random() * 1100,
+                duration: 2200 + Math.random() * 1400,
                 ease: "Sine.easeInOut",
                 yoyo: true,
                 repeat: -1,
@@ -595,6 +595,16 @@ export function PlatformerGame() {
           this.add.text(14, 10, label, {
             fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "14px", color: theme.labelColor,
           }).setAlpha(0.7).setDepth(D_UI);
+
+          // Instructions — room 0 only, top-center
+          if (this.roomIndex === 0) {
+            this.add.text(width / 2, 18, "WASD / Arrow Keys to move   ·   ESC for boring-mode", {
+              fontFamily: "Arial, Helvetica, sans-serif",
+              fontStyle: "bold",
+              fontSize: "15px",
+              color: "#ffffff",
+            }).setOrigin(0.5, 0).setAlpha(0.55).setDepth(D_UI);
+          }
 
           // Exit arrows
           if (this.roomIndex < ROOMS.length - 1)
@@ -849,19 +859,6 @@ export function PlatformerGame() {
               prop.key
             ).setOrigin(0.5, 1).setScale(prop.scale ?? 1).setDepth(D_FGPROP);
             if (prop.flipX) img.setFlipX(true);
-            // Flowers sway more than bushes
-            if (this.roomIndex === 0) {
-              const swing = prop.key === "flowers-forest" ? 2.5 : 1.6;
-              this.tweens.add({
-                targets: img,
-                angle: swing * (Math.random() > 0.5 ? 1 : -1),
-                duration: 1600 + Math.random() * 1200,
-                ease: "Sine.easeInOut",
-                yoyo: true,
-                repeat: -1,
-                delay: Math.random() * 700,
-              });
-            }
           }
 
           this.player.play("Idle");
