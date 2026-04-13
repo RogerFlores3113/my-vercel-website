@@ -285,17 +285,18 @@ export function PlatformerGame() {
             { key: "flowers-forest", xFrac: 0.58, yAbove: -6, scale: 1.2, flipX: true, layer: "fg" },
             { key: "flowers-forest", xFrac: 0.86, yAbove: -6, scale: 1.1, layer: "fg" },
             // fg — fern clusters (odd groupings, varying scale)
-            { key: "fern-cluster", xFrac: 0.10, yAbove: 0, scale: 1.1, layer: "fg" },
-            { key: "fern-cluster", xFrac: 0.48, yAbove: 0, scale: 0.85, flipX: true, layer: "fg" },
-            { key: "fern-cluster", xFrac: 0.88, yAbove: 0, scale: 1.3, layer: "fg" },
-            // fg — mushroom clusters near tree bases (small scale for ground-level)
-            { key: "mushrooms", xFrac: 0.32, yAbove: 0, scale: 0.9, layer: "fg" },
-            { key: "mushrooms", xFrac: 0.70, yAbove: 0, scale: 0.75, flipX: true, layer: "fg" },
-            // bg — mossy rocks scattered across ground
-            { key: "mossy-rocks", xFrac: 0.55, yAbove: 0, scale: 1.0, layer: "bg" },
-            { key: "mossy-rocks", xFrac: 0.90, yAbove: 0, scale: 0.8, flipX: true, layer: "bg" },
-            // bg — hollow fallen log (no collision — player walks through it)
-            { key: "log-hollow", xFrac: 0.50, yAbove: 4, scale: 1.4, layer: "bg" },
+            // yAbove = -(transparentBottomPx * scale): fern-cluster has ~3px transparent bottom
+            { key: "fern-cluster", xFrac: 0.10, yAbove: -3, scale: 1.1, layer: "fg" },
+            { key: "fern-cluster", xFrac: 0.48, yAbove: -3, scale: 0.85, flipX: true, layer: "fg" },
+            { key: "fern-cluster", xFrac: 0.88, yAbove: -4, scale: 1.3, layer: "fg" },
+            // fg — mushroom clusters near tree bases (mushrooms has ~7px transparent bottom)
+            { key: "mushrooms", xFrac: 0.32, yAbove: -6, scale: 0.9, layer: "fg" },
+            { key: "mushrooms", xFrac: 0.70, yAbove: -5, scale: 0.75, flipX: true, layer: "fg" },
+            // bg — mossy rocks scattered across ground (mossy-rocks has ~4px transparent bottom)
+            { key: "mossy-rocks", xFrac: 0.55, yAbove: -4, scale: 1.0, layer: "bg" },
+            { key: "mossy-rocks", xFrac: 0.90, yAbove: -3, scale: 0.8, flipX: true, layer: "bg" },
+            // bg — hollow fallen log (log-hollow has ~12px transparent bottom)
+            { key: "log-hollow", xFrac: 0.50, yAbove: -17, scale: 1.4, layer: "bg" },
           ],
           vines: [
             { xFrac: 0.18, topAbove: 240 },
@@ -354,6 +355,12 @@ export function PlatformerGame() {
             frames: Array.from({ length: 8 }, (_, i) => ({ key: `rp2-jump-east-${i}` })),
             frameRate: 10,
             repeat: 0,
+          });
+          this.anims.create({
+            key: "Walk",
+            frames: Array.from({ length: 4 }, (_, i) => ({ key: `rp2-walk-east-${i}` })),
+            frameRate: 8,
+            repeat: -1,
           });
           this.anims.create({
             key: "ClimbN",
@@ -435,6 +442,11 @@ export function PlatformerGame() {
             if (!this.textures.exists(`rp2-jump-east-${i}`))
               this.load.image(`rp2-jump-east-${i}`, `${RP_BASE}/${ANIM_DIRS.jump}/east/frame_${f}.png`);
           }
+          // east frames: walk (4)
+          for (let i = 0; i < 4; i++) {
+            if (!this.textures.exists(`rp2-walk-east-${i}`))
+              this.load.image(`rp2-walk-east-${i}`, `${RP_BASE}/${ANIM_DIRS.climb}/east/frame_${padN(i)}.png`);
+          }
           // north frames: climb (4)
           for (let i = 0; i < 4; i++) {
             if (!this.textures.exists(`rp2-climb-north-${i}`))
@@ -442,8 +454,8 @@ export function PlatformerGame() {
           }
 
           // ── Room 0 background ────────────────────────────────────────────────
-          if (!this.textures.exists("bg-landing"))
-            this.load.image("bg-landing", "/props/pixellab-Misty-asian-jungle-background.png");
+          if (!this.textures.exists("bg-forest"))
+            this.load.image("bg-forest", "/sprites/forest-background.jpg");
 
           // ── Prop textures — load once, skip if already cached ────────────────
           const propAssets: [string, string][] = [
@@ -495,11 +507,11 @@ export function PlatformerGame() {
                 D_FGPROP = 15, D_SIGN = 16, D_UI = 20;
 
           // ── Background ────────────────────────────────────────────────────────
-          if (this.roomIndex === 0 && this.textures.exists("bg-landing")) {
-            // PixelLab misty jungle image fills the sky area
-            this.add.image(width / 2, height / 2, "bg-landing")
+          if (this.roomIndex === 0 && this.textures.exists("bg-forest")) {
+            // Forest background image fills the full canvas
+            this.add.image(width / 2, height / 2, "bg-forest")
               .setDisplaySize(width, height)
-              .setAlpha(0.80)
+              .setAlpha(0.85)
               .setDepth(D_SKY);
           } else {
             this.add.rectangle(0, 0, width, height, theme.bg).setOrigin(0, 0).setDepth(D_SKY);
@@ -563,34 +575,8 @@ export function PlatformerGame() {
               this.add.rectangle(0, y, width, h, col).setOrigin(0, 0).setAlpha(a).setDepth(D_BGFX);
             }
 
-            // Distant canopy crown silhouette at very top
+            // Bamboo leaf cap graphics (reused per stalk below)
             const canopyGfx = this.add.graphics().setDepth(D_BGFX);
-            canopyGfx.fillStyle(0x060f07, 0.90);
-            const crownX = [0.04, 0.13, 0.24, 0.37, 0.50, 0.62, 0.74, 0.85, 0.94];
-            const crownH = [42, 58, 46, 64, 52, 60, 44, 56, 40];
-            for (let i = 0; i < crownX.length; i++) {
-              canopyGfx.fillEllipse(crownX[i] * width, crownH[i] * 0.5, crownH[i] * 1.9, crownH[i]);
-            }
-
-            // Light shafts — 6 warm golden-green beams, angled
-            const shaftGfx = this.add.graphics().setDepth(D_BGFX);
-            const shafts = [
-              { x: width * 0.20, w: 22, angle: -0.05 },
-              { x: width * 0.36, w: 42, angle: -0.02 },
-              { x: width * 0.52, w: 60, angle:  0.02 },
-              { x: width * 0.64, w: 28, angle:  0.04 },
-              { x: width * 0.76, w: 18, angle:  0.06 },
-              { x: width * 0.88, w: 36, angle:  0.03 },
-            ];
-            for (const s of shafts) {
-              const drift = Math.round(groundY * s.angle);
-              shaftGfx.fillStyle(0xa8d060, 0.048);
-              shaftGfx.fillTriangle(
-                s.x - s.w / 2 + drift, groundY,
-                s.x + s.w / 2 + drift, groundY,
-                s.x, 0
-              );
-            }
 
             // Bamboo silhouettes — bottom-anchored so rotation = natural base-sway
             const bamPos = [0.05, 0.11, 0.18, 0.60, 0.68, 0.76, 0.84, 0.90, 0.96];
@@ -729,19 +715,28 @@ export function PlatformerGame() {
           const SIGN_NAMES: Record<string, string> = {
             landing: "About Me", projects: "Projects", about: "Now", reading: "Reading",
           };
+          // Only include keys that are actually loaded
+          const availableSignKeys = SIGN_KEYS.filter(k => this.textures.exists(k));
+          // Transparent bottom padding per sign (px at scale 1); used to sink image so it sits flush
+          const SIGN_SINK: Record<string, number> = {
+            "sign-jungle":  6,   // 3px transparent * scale 2
+            "sign-lantern": 12,  // 6px transparent * scale 2
+            "sign-mossy":   6,   // ~3px transparent * scale 2
+          };
           this.signDefs  = [];
           this.signHints = [];
           for (let si = 0; si < theme.signs.length; si++) {
             const sd = theme.signs[si];
             const sx = Math.round(sd.xFrac * width);
             this.signDefs.push({ x: sx, modalId: sd.modalId });
-            // Pick sign variant (cycle through available keys)
-            const signKey = SIGN_KEYS.find(k => this.textures.exists(k)) ?? null;
-            const altKey  = si % 2 === 1 ? (SIGN_KEYS[1] ?? signKey) : signKey;
-            const usedKey = (altKey && this.textures.exists(altKey)) ? altKey : signKey;
+            // Cycle through all available sign keys
+            const usedKey = availableSignKeys.length > 0
+              ? availableSignKeys[si % availableSignKeys.length]
+              : null;
+            const sink    = usedKey ? (SIGN_SINK[usedKey] ?? 6) : 0;
             const boardY  = groundY - 52;
             if (usedKey) {
-              this.add.image(sx, groundY, usedKey)
+              this.add.image(sx, groundY + sink, usedKey)
                 .setOrigin(0.5, 1).setScale(2).setDepth(D_SIGN);
               // Label on board
               const label = SIGN_NAMES[sd.modalId] ?? "ENT";
@@ -833,7 +828,7 @@ export function PlatformerGame() {
           // ── Chunky mist sprites (room 0) ─────────────────────────────────────
           this.mistSprites = [];
           if (this.roomIndex === 0 && this.textures.exists("mist-tile")) {
-            const mistCount = 5 + Math.floor(Math.random() * 3); // 5-7
+            const mistCount = 45 + Math.floor(Math.random() * 10); // 45-54
             for (let m = 0; m < mistCount; m++) {
               const mx    = Math.random() * width;
               const my    = groundY - 15 - Math.random() * 70;
@@ -856,7 +851,7 @@ export function PlatformerGame() {
             : (this.entryFromLeft ? 80 : width - 80);
           const startY = groundY - (theme.spawnYAbove ?? 32);
           this.player = this.physics.add.sprite(startX, startY, "rp2-idle-east-0")
-            .setScale(2).setDepth(D_PLAYER);
+            .setScale(1.5).setDepth(D_PLAYER);
           (this.player.body as Phaser.Physics.Arcade.Body)
             .setSize(22, 28)
             .setOffset(13, 10);
@@ -958,8 +953,7 @@ export function PlatformerGame() {
 
           if (this.onVine) {
             body.allowGravity = false;
-            // Soft X centering — pulls toward vine without hard-snapping (fixes the lockup)
-            body.setVelocityX((this.activeVineX - this.player.x) * 10);
+            // No X manipulation — player stays wherever they grabbed the vine
 
             if (up)        body.setVelocityY(-120);
             else if (down) body.setVelocityY(100);
@@ -996,7 +990,8 @@ export function PlatformerGame() {
           if (!onGround) {
             if (anim !== "Jump") this.player.play("Jump", true);
           } else if (left || right) {
-            if (anim !== "Run")  this.player.play("Run", true);
+            if (sprint) { if (anim !== "Run")  this.player.play("Run",  true); }
+            else        { if (anim !== "Walk") this.player.play("Walk", true); }
           } else {
             if (anim !== "Idle") this.player.play("Idle", true);
           }
