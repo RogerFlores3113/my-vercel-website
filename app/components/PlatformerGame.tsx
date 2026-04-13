@@ -340,6 +340,7 @@ export function PlatformerGame() {
         private jumpKey!:  Phaser.Input.Keyboard.Key;
         private enterKey!: Phaser.Input.Keyboard.Key;
         private shiftKey!: Phaser.Input.Keyboard.Key;
+        private escKey!:   Phaser.Input.Keyboard.Key;
 
         // Signs (modals)
         private signDefs:  Array<{ x: number; modalId: string }> = [];
@@ -738,7 +739,9 @@ export function PlatformerGame() {
               fontFamily: "Arial, Helvetica, sans-serif",
               fontStyle: "bold",
               fontSize: "15px",
-              color: "#1a6e30",
+              color: "#ffffff",
+              stroke: "#1a3a10",
+              strokeThickness: 4,
             }).setOrigin(0.5).setAlpha(0).setDepth(D_UI);
             this.signHints.push(hint);
           }
@@ -884,11 +887,7 @@ export function PlatformerGame() {
           this.jumpKey  = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
           this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
           this.shiftKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
-
-          // ESC — fire a custom event; React decides whether to close modal or go to /boring
-          this.input.keyboard!.on("keydown-ESC", () => {
-            window.dispatchEvent(new CustomEvent("game-esc"));
-          });
+          this.escKey   = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
           this.cameras.main.fadeIn(200, 0, 0, 0);
         }
@@ -896,14 +895,17 @@ export function PlatformerGame() {
         update() {
           if (this.transitioning) return;
 
+          // ESC — navigate to /boring (React handler decides if modal is open first)
+          if (Phaser.Input.Keyboard.JustDown(this.escKey)) {
+            window.dispatchEvent(new CustomEvent("game-esc"));
+          }
+
           const body     = this.player.body as Phaser.Physics.Arcade.Body;
           const onGround = body.blocked.down;
           const { width } = this.scale;
 
           const left  = this.cursors.left.isDown  || this.wasd.left.isDown;
           const right = this.cursors.right.isDown || this.wasd.right.isDown;
-          const up    = this.cursors.up.isDown    || this.wasd.up.isDown;
-          const down  = this.cursors.down.isDown  || this.wasd.down.isDown;
           const sprint = this.shiftKey.isDown;
           const jumpPressed =
             Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
@@ -919,15 +921,13 @@ export function PlatformerGame() {
 
           if (jumpPressed && onGround) body.setVelocityY(this.JUMP_VY);
 
-          // Animation state machine
-          const anim = this.player.anims.currentAnim?.key;
+          // Animation state machine — play(key, true) = don't restart if already playing
           if (!onGround) {
-            if (anim !== "Jump") this.player.play("Jump", true);
+            this.player.play("Jump", true);
           } else if (left || right) {
-            if (sprint) { if (anim !== "Run")  this.player.play("Run",  true); }
-            else        { if (anim !== "Walk") this.player.play("Walk", true); }
+            this.player.play(sprint ? "Run" : "Walk", true);
           } else {
-            if (anim !== "Idle") this.player.play("Idle", true);
+            this.player.play("Idle", true);
           }
 
           // Mist drift (chunky individual images)
