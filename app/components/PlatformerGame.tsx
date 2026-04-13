@@ -324,6 +324,12 @@ export function PlatformerGame() {
             frameRate: 8,
             repeat: -1,
           });
+          this.anims.create({
+            key: "IdleSouth",
+            frames: Array.from({ length: 8 }, (_, i) => ({ key: `rp2-idle-south-${i}` })),
+            frameRate: 8,
+            repeat: -1,
+          });
         }
       }
 
@@ -356,6 +362,9 @@ export function PlatformerGame() {
         private platforms!: Phaser.Physics.Arcade.StaticGroup;
         // Mist (chunky individual sprites)
         private mistSprites: Array<{ img: Phaser.GameObjects.Image; vx: number }> = [];
+        // Dad-joke bubble
+        private jokeBubble: Phaser.GameObjects.Container | null = null;
+        private jokeShown  = false;
 
         private lastInputTime = 0;   // ms timestamp of last key press
         private readonly IDLE_DELAY  = 3000; // ms before idle animation kicks in
@@ -373,6 +382,8 @@ export function PlatformerGame() {
           this.entryFromLeft  = (data.fromLeft as boolean) !== false;
           this.transitioning  = false;
           this.lastInputTime  = 0;
+          this.jokeBubble     = null;
+          this.jokeShown      = false;
           this.signDefs       = [];
           this.signHints      = [];
           this.activeSignIdx  = -1;
@@ -405,6 +416,17 @@ export function PlatformerGame() {
             if (!this.textures.exists(`rp2-climb-north-${i}`))
               this.load.image(`rp2-climb-north-${i}`, `${RP_BASE}/${ANIM_DIRS.climb}/north/frame_${padN(i)}.png`);
           }
+
+          // ── Idle-south frames (8 frames) ─────────────────────────────────────
+          for (let i = 0; i < 8; i++) {
+            if (!this.textures.exists(`rp2-idle-south-${i}`))
+              this.load.image(`rp2-idle-south-${i}`,
+                `${RP_BASE}/${ANIM_DIRS.idle}/south/frame_${padN(i)}.png`);
+          }
+
+          // ── Dad jokes ────────────────────────────────────────────────────────
+          if (!this.cache.json.exists("dad-jokes"))
+            this.load.json("dad-jokes", "/dad-jokes.json");
 
           // ── Room 0 background ────────────────────────────────────────────────
           if (!this.textures.exists("bg-forest"))
@@ -823,7 +845,7 @@ export function PlatformerGame() {
             const mistKeys = ["mist-tile", "mist-cloud-a", "mist-cloud-b"]
               .filter(k => this.textures.exists(k));
             if (mistKeys.length > 0) {
-              const mistCount = 45 + Math.floor(Math.random() * 10); // 45-54
+              const mistCount = 22 + Math.floor(Math.random() * 6); // 22-27
               for (let m = 0; m < mistCount; m++) {
                 const key   = mistKeys[m % mistKeys.length];
                 const mx    = Math.random() * width;
@@ -915,13 +937,15 @@ export function PlatformerGame() {
             Phaser.Input.Keyboard.JustDown(this.wasd.up)    ||
             Phaser.Input.Keyboard.JustDown(this.jumpKey);
 
-          const speed = sprint ? this.SPEED * 1.75 : this.SPEED;
-
-          // Track last input time — any directional or jump key resets the idle timer
+          const speed    = sprint ? this.SPEED * 1.75 : this.SPEED;
           const anyInput = left || right || jumpPressed;
-          if (anyInput) this.lastInputTime = this.time.now;
-          const idleReady = onGround && !left && !right &&
-            (this.time.now - this.lastInputTime) >= this.IDLE_DELAY;
+          const idleMs   = this.time.now - this.lastInputTime;
+
+          // Any input resets idle timer and hides active joke bubble
+          if (anyInput) {
+            this.lastInputTime = this.time.now;
+            this.hideJoke();
+          }
 
           // ── Normal movement ────────────────────────────────────────────────────
           if (left)       { body.setVelocityX(-speed); this.player.setFlipX(true); }
@@ -935,13 +959,18 @@ export function PlatformerGame() {
             this.player.play("Jump", true);
           } else if (left || right) {
             this.player.play(sprint ? "Run" : "Walk", true);
-          } else if (idleReady) {
-            // After IDLE_DELAY of no input — play the looping idle fidget animation
-            this.player.play("Idle", true);
+          } else if (idleMs >= this.IDLE_DELAY) {
+            // 3s+ idle — face viewer (south idle)
+            this.player.play("IdleSouth", true);
+            if (idleMs >= 10000 && !this.jokeShown) this.showJoke();
           } else {
-            // Just stopped — freeze on standing pose (frame 0 of idle sprite)
-            this.player.anims.stop();
-            this.player.setTexture("rp2-idle-east-0");
+            // Just stopped — play east idle immediately
+            this.player.play("Idle", true);
+          }
+
+          // Keep joke bubble over panda's head
+          if (this.jokeBubble) {
+            this.jokeBubble.setPosition(this.player.x, this.player.y - 70);
           }
 
           // Mist drift (chunky individual images)
@@ -1007,6 +1036,56 @@ export function PlatformerGame() {
             this.player.x = Math.max(this.player.x, half + 2);
           if (this.roomIndex === ROOMS.length - 1)
             this.player.x = Math.min(this.player.x, width - half - 2);
+        }
+
+        private showJoke(): void {
+          if (this.jokeShown) return;
+          this.jokeShown = true;
+
+          const jokes: string[] = this.cache.json.get("dad-jokes") ?? [];
+          if (!jokes.length) return;
+          const joke = jokes[Math.floor(Math.random() * jokes.length)];
+
+          const pad  = 12;
+          const maxW = 190;
+          const tailH = 10;
+
+          // Probe text dimensions then discard
+          const probe = this.add.text(0, -9999, joke, {
+            fontFamily: "Arial, sans-serif", fontSize: "11px",
+            wordWrap: { width: maxW - pad * 2 },
+          });
+          const bw = Math.min(Math.ceil(probe.width)  + pad * 2, maxW);
+          const bh = Math.ceil(probe.height) + pad * 2;
+          probe.destroy();
+
+          // Bubble graphics — off-white, slightly green-tinted
+          const gfx = this.add.graphics();
+          gfx.fillStyle(0xeef8ee, 0.96);
+          gfx.lineStyle(1.5, 0x5aaa6a, 0.85);
+          gfx.fillRoundedRect(-bw / 2, -(bh + tailH), bw, bh, 8);
+          gfx.strokeRoundedRect(-bw / 2, -(bh + tailH), bw, bh, 8);
+          // Tail pointer
+          gfx.fillStyle(0xeef8ee, 0.96);
+          gfx.fillTriangle(-7, -tailH, 7, -tailH, 0, 0);
+
+          const txt = this.add.text(0, -(bh / 2 + tailH), joke, {
+            fontFamily: "Arial, sans-serif", fontSize: "11px",
+            color: "#1a3a1a",
+            wordWrap: { width: maxW - pad * 2 },
+            align: "center",
+          }).setOrigin(0.5, 0.5);
+
+          this.jokeBubble = this.add.container(
+            this.player.x, this.player.y - 70, [gfx, txt]
+          ).setDepth(25);
+        }
+
+        private hideJoke(): void {
+          if (!this.jokeShown) return;
+          this.jokeShown = false;
+          this.jokeBubble?.destroy();
+          this.jokeBubble = null;
         }
 
         private startTransition(nextIndex: number, playerEnteredFromLeft: boolean) {
