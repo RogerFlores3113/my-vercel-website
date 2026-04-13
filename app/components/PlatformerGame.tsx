@@ -6,7 +6,6 @@ import { GameLoader } from "./GameLoader";
 // ─── Room config (order = left-to-right in the world) ─────────────────────────
 const ROOMS = [
   { key: "landing" },
-  { key: "socials" },  // social links room — no modal, opens URLs
 ] as const;
 
 // Animation dirs on disk (hardcoded to avoid metadata.json key mismatch)
@@ -273,21 +272,6 @@ export function PlatformerGame() {
             { xFrac: 0.59, modalId: "about"    },
             { xFrac: 0.78, modalId: "reading"  },
           ],
-        },
-        { // 1 socials — stone temple, warm torchlight
-          bg: 0x1a0e06, ground: 0x2d1e0a, line: 0x7a4010,
-          platformFill: 0x2d1e0a, platformEdge: 0x9a5020,
-          labelColor: "#c8a060", arrowColor: "#7a4010",
-          spawnXFrac: 0.12, spawnYAbove: 20,
-          platforms: [
-            { xFrac: 0.25, yAbove: 90, w: 120 }, // pedestal left  (linkedin)
-            { xFrac: 0.50, yAbove: 90, w: 120 }, // pedestal center (github)
-            { xFrac: 0.75, yAbove: 90, w: 120 }, // pedestal right (email)
-            { xFrac: 0.12, yAbove: 50, w: 80 },  // step left
-            { xFrac: 0.88, yAbove: 50, w: 80 },  // step right
-          ],
-          props: [],
-          signs: [],
           socials: [
             { xFrac: 0.25, url: "https://www.linkedin.com/in/roger-flores-3113-nu/", label: "LinkedIn" },
             { xFrac: 0.50, url: "https://github.com/RogerFlores3113",               label: "GitHub"   },
@@ -635,26 +619,6 @@ export function PlatformerGame() {
             }).setOrigin(0.5, 0).setAlpha(0.92).setDepth(D_UI);
           }
 
-          // Exit arrows
-          if (this.roomIndex < ROOMS.length - 1) {
-            this.add.text(width - 18, groundY - 20, "›", {
-              fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "20px", color: theme.arrowColor,
-            }).setAlpha(0.5).setDepth(D_UI);
-            // "Socials →" label at top-right pointing to next room (room 0 only)
-            if (this.roomIndex === 0)
-              this.add.text(width - 14, 14, "Socials →", {
-                fontFamily: "Arial, Helvetica, sans-serif",
-                fontStyle: "bold",
-                fontSize: "14px",
-                color: "#ffffff",
-                stroke: "#000000",
-                strokeThickness: 2,
-              }).setOrigin(1, 0).setAlpha(0.85).setDepth(D_UI);
-          }
-          if (this.roomIndex > 0)
-            this.add.text(10, groundY - 20, "‹", {
-              fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "20px", color: theme.arrowColor,
-            }).setAlpha(0.5).setDepth(D_UI);
 
           // ── Animations ────────────────────────────────────────────────────────
           this.buildAnimations();
@@ -788,20 +752,20 @@ export function PlatformerGame() {
             this.signHints.push(hint);
           }
 
-          // ── Social statues (room 1) ───────────────────────────────────────────
-          this.socialLinks  = [];
-          this.socialHints  = [];
+          // ── Social badges — underground stone display, click to open ─────────────
+          this.socialLinks = [];
+          this.socialHints = [];
           if (theme.socials) {
+            const badgeKeyMap: Record<string, string> = {
+              "LinkedIn": "linkedin-badge",
+              "GitHub":   "github-badge",
+              "Email":    "gmail-badge",
+            };
+            // Center badges in the stone tile layer
+            const badgeY = groundY + grassH + dirtH + 30;
             for (const soc of theme.socials) {
               const sx = Math.round(soc.xFrac * width);
               this.socialLinks.push({ x: sx, url: soc.url });
-              // Stone-emblem-display + badge sitting on the ground surface, clickable
-              const badgeY = groundY - 42; // emblem bottom rests at groundY
-              const badgeKeyMap: Record<string, string> = {
-                "LinkedIn": "linkedin-badge",
-                "GitHub":   "github-badge",
-                "Email":    "gmail-badge",
-              };
               if (this.textures.exists("stone-emblem-display"))
                 this.add.image(sx, badgeY, "stone-emblem-display")
                   .setOrigin(0.5, 0.5).setDepth(D_FGPROP);
@@ -812,28 +776,6 @@ export function PlatformerGame() {
                 badgeImg.setInteractive({ useHandCursor: true });
                 badgeImg.on("pointerdown", () => window.open(soc.url, "_blank"));
               }
-              // Warm flicker glow behind each torch
-              const glow = this.add.circle(sx, groundY - 100, 16, 0xff8820, 0.25)
-                .setDepth(D_BGFX);
-              this.tweens.add({
-                targets: glow,
-                alpha: { from: 0.18, to: 0.35 },
-                scaleX: { from: 0.9, to: 1.1 },
-                scaleY: { from: 0.9, to: 1.1 },
-                duration: 600 + Math.random() * 400,
-                ease: "Sine.easeInOut",
-                yoyo: true,
-                repeat: -1,
-              });
-              // Label
-              this.add.text(sx, groundY - 100, soc.label, {
-                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "12px", color: "#c8a060",
-              }).setOrigin(0.5).setDepth(D_SIGN);
-              // Proximity hint (initially hidden)
-              const hint = this.add.text(sx, groundY - 115, "[ ENTER ]", {
-                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "12px", color: "#ffa040",
-              }).setOrigin(0.5).setAlpha(0).setDepth(D_UI);
-              this.socialHints.push(hint);
             }
           }
 
@@ -1117,9 +1059,8 @@ export function PlatformerGame() {
         }
       }
 
-      // ── 2 room scenes ─────────────────────────────────────────────────────────
-      class LandingScene  extends RoomScene { constructor() { super({ key: "landing" }, 0); } }
-      class SocialsScene  extends RoomScene { constructor() { super({ key: "socials" }, 1); } }
+      // ── Room scene ────────────────────────────────────────────────────────────
+      class LandingScene extends RoomScene { constructor() { super({ key: "landing" }, 0); } }
 
       const game = new Phaser.Game({
         type: Phaser.AUTO,
@@ -1134,7 +1075,7 @@ export function PlatformerGame() {
           default: "arcade",
           arcade: { gravity: { x: 0, y: 2000 }, debug: false },
         },
-        scene: [LandingScene, SocialsScene],
+        scene: [LandingScene],
       });
 
       gameRef.current = game;
