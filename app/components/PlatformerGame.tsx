@@ -1046,13 +1046,14 @@ export function PlatformerGame() {
           if (!jokes.length) return;
           const joke = jokes[Math.floor(Math.random() * jokes.length)];
 
-          const pad  = 12;
-          const maxW = 190;
+          const pad   = 14;
+          const maxW  = 220;
           const tailH = 10;
+          const jokeFont = "Comic Sans MS, Chalkboard SE, Marker Felt, cursive";
 
           // Probe text dimensions then discard
           const probe = this.add.text(0, -9999, joke, {
-            fontFamily: "Arial, sans-serif", fontSize: "11px",
+            fontFamily: jokeFont, fontSize: "15px",
             wordWrap: { width: maxW - pad * 2 },
           });
           const bw = Math.min(Math.ceil(probe.width)  + pad * 2, maxW);
@@ -1070,7 +1071,7 @@ export function PlatformerGame() {
           gfx.fillTriangle(-7, -tailH, 7, -tailH, 0, 0);
 
           const txt = this.add.text(0, -(bh / 2 + tailH), joke, {
-            fontFamily: "Arial, sans-serif", fontSize: "11px",
+            fontFamily: jokeFont, fontSize: "15px",
             color: "#1a3a1a",
             wordWrap: { width: maxW - pad * 2 },
             align: "center",
