@@ -20,7 +20,7 @@ function padN(n: number) { return String(n).padStart(3, "0"); }
 // ─── Modal content ─────────────────────────────────────────────────────────────
 // Real HTML rendered in a React overlay — links, formatting all work fine.
 function ModalContent({ id }: { id: string }) {
-  const s = { p: { marginBottom: 10, fontSize: 13, lineHeight: 1.7 } as React.CSSProperties };
+  const s = { p: { marginBottom: 12, fontSize: "clamp(14px, 1.3vw, 17px)", lineHeight: 1.75 } as React.CSSProperties };
 
   if (id === "landing") return (
     <>
@@ -158,21 +158,20 @@ function Modal({ modalId, onClose }: { modalId: string; onClose: () => void }) {
         style={{
           background: "#1a2e1a",
           border: "2px solid #4a7c3f",
-          borderRadius: 8,
-          padding: "28px 32px",
-          maxWidth: 480,
-          width: "90%",
-          maxHeight: "80vh",
+          borderRadius: 10,
+          padding: "clamp(22px, 3vw, 40px) clamp(24px, 3.5vw, 44px)",
+          width: "clamp(320px, 55vw, 680px)",
+          maxHeight: "85vh",
           overflowY: "auto",
           fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif",
           color: "#a8a69e",
         }}
       >
-        <h2 style={{ color: "#9fe1cb", marginBottom: 16, fontSize: 16, fontWeight: 600 }}>
+        <h2 style={{ color: "#9fe1cb", marginBottom: 18, fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 600 }}>
           {titles[modalId]}
         </h2>
         <ModalContent id={modalId} />
-        <div style={{ marginTop: 20, borderTop: "1px solid #2d4a1e", paddingTop: 12, fontSize: 11, color: "#4a7c3f", display: "flex", gap: 16 }}>
+        <div style={{ marginTop: 22, borderTop: "1px solid #2d4a1e", paddingTop: 14, fontSize: "clamp(12px, 1vw, 14px)", color: "#4a7c3f", display: "flex", gap: 16 }}>
           <span>[ESC] close</span>
           <a href="/boring" style={{ color: "#4a7c3f" }}>full site →</a>
         </div>
@@ -694,6 +693,12 @@ export function PlatformerGame() {
             "about":    "#d4c8a0",
             "reading":  "#d4c8a0",
           };
+          const SIGN_LABEL_STROKE: Record<string, string> = {
+            "landing":  "#ffffff",
+            "projects": "#ffffff",
+            "about":    "#000000",
+            "reading":  "#000000",
+          };
           // Per-sign hover hint Y ([ ENTER ] prompt)
           const SIGN_HINT_Y: Record<string, number> = {
             "landing":  groundY - 52,
@@ -718,14 +723,15 @@ export function PlatformerGame() {
                 .setOrigin(0.5, 1).setScale(2).setDepth(D_SIGN);
               // Label on board
               const label = SIGN_NAMES[sd.modalId] ?? "ENT";
-              const labelY     = SIGN_LABEL_Y[sd.modalId]     ?? groundY - 88;
-              const labelColor = SIGN_LABEL_COLOR[sd.modalId] ?? "#d4c8a0";
+              const labelY      = SIGN_LABEL_Y[sd.modalId]     ?? groundY - 88;
+              const labelColor  = SIGN_LABEL_COLOR[sd.modalId] ?? "#d4c8a0";
+              const labelStroke = SIGN_LABEL_STROKE[sd.modalId] ?? "#ffffff";
               this.add.text(sx, labelY, label, {
                 fontFamily: "Arial, Helvetica, sans-serif",
                 fontStyle: "bold",
                 fontSize: "13px",
                 color: labelColor,
-                stroke: "#ffffff",
+                stroke: labelStroke,
                 strokeThickness: 1,
               }).setOrigin(0.5).setDepth(D_SIGN + 0.1);
             } else {
@@ -761,8 +767,8 @@ export function PlatformerGame() {
               "GitHub":   "github-badge",
               "Email":    "gmail-badge",
             };
-            // Center badges in the stone tile layer
-            const badgeY = groundY + grassH + dirtH + 30;
+            // Sink badges solidly into the stone tile layer
+            const badgeY = groundY + grassH + dirtH + 48;
             for (const soc of theme.socials) {
               const sx = Math.round(soc.xFrac * width);
               this.socialLinks.push({ x: sx, url: soc.url });
