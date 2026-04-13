@@ -190,18 +190,17 @@ export function PlatformerGame() {
   const [loadError, setLoadError] = useState(false);
   const [modal,     setModal]     = useState<string | null>(null);
 
-  // ESC: close modal first, then navigate to /boring
+  // ESC: Phaser fires "game-esc"; close modal if open, else go to /boring
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
+    const onEsc = () => {
       setModal(prev => {
         if (prev !== null) return null;
         window.location.href = "/boring";
         return null;
       });
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("game-esc", onEsc);
+    return () => window.removeEventListener("game-esc", onEsc);
   }, []);
 
   // Open modal event from Phaser
@@ -538,9 +537,7 @@ export function PlatformerGame() {
             // Fixed anchor props — large statement bg features
             const anchors: PropDef[] = [
               // Tall fir tree centred in the scene (falls back to tree-himalaya if not loaded yet)
-              this.textures.exists("fir-tree")
-                ? { key: "fir-tree",      xFrac: 0.50, yAbove: -75, scale: 3.5,  layer: "bg" }
-                : { key: "tree-himalaya", xFrac: 0.50, yAbove: -23, scale: 2.0,  layer: "bg" },
+              { key: "tree-himalaya", xFrac: 0.50, yAbove: -60, scale: 3.0, layer: "bg" },
               // Bamboo groves at the far sides
               { key: "bamboo", xFrac: 0.10, yAbove: -27, scale: 1.3, layer: "bg" },
               { key: "bamboo", xFrac: 0.88, yAbove: -27, scale: 1.1, flipX: true, layer: "bg" },
@@ -601,9 +598,11 @@ export function PlatformerGame() {
             this.add.text(width / 2, 18, "WASD / Arrow Keys to move   ·   ESC for boring-mode", {
               fontFamily: "Arial, Helvetica, sans-serif",
               fontStyle: "bold",
-              fontSize: "15px",
+              fontSize: "16px",
               color: "#ffffff",
-            }).setOrigin(0.5, 0).setAlpha(0.55).setDepth(D_UI);
+              stroke: "#000000",
+              strokeThickness: 3,
+            }).setOrigin(0.5, 0).setAlpha(0.92).setDepth(D_UI);
           }
 
           // Exit arrows
@@ -690,6 +689,13 @@ export function PlatformerGame() {
             "about":    "#d4c8a0",
             "reading":  "#d4c8a0",
           };
+          // Per-sign hover hint Y ([ ENTER ] prompt)
+          const SIGN_HINT_Y: Record<string, number> = {
+            "landing":  groundY - 52,
+            "projects": groundY - 52,
+            "about":    groundY - 62,
+            "reading":  groundY - 76,
+          };
           this.signDefs  = [];
           this.signHints = [];
           for (let si = 0; si < theme.signs.length; si++) {
@@ -727,8 +733,12 @@ export function PlatformerGame() {
                 color: "#d4a06a",
               }).setOrigin(0.5).setDepth(D_SIGN);
             }
-            const hint = this.add.text(sx, boardY - 24, "[ ENTER ]", {
-              fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "12px", color: "#c8905a",
+            const hintY = SIGN_HINT_Y[sd.modalId] ?? groundY - 76;
+            const hint = this.add.text(sx, hintY, "[ ENTER ]", {
+              fontFamily: "Arial, Helvetica, sans-serif",
+              fontStyle: "bold",
+              fontSize: "15px",
+              color: "#1a6e30",
             }).setOrigin(0.5).setAlpha(0).setDepth(D_UI);
             this.signHints.push(hint);
           }
@@ -874,6 +884,11 @@ export function PlatformerGame() {
           this.jumpKey  = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
           this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
           this.shiftKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+
+          // ESC — fire a custom event; React decides whether to close modal or go to /boring
+          this.input.keyboard!.on("keydown-ESC", () => {
+            window.dispatchEvent(new CustomEvent("game-esc"));
+          });
 
           this.cameras.main.fadeIn(200, 0, 0, 0);
         }
