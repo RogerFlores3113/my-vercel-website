@@ -533,10 +533,10 @@ export function PlatformerGame() {
           };
           if (this.textures.exists("grass-tile"))
             this.add.tileSprite(0, groundY, width, grassH, "grass-tile").setOrigin(0,0).setDepth(D_GROUND);
-          // Thin grass edge — must be in FRONT of everything (props, player, signs)
+          // Thin grass edge — absolute front of scene (above mist, player, everything)
           if (this.textures.exists("grass-tile"))
             this.add.tileSprite(0, groundY, width, 12, "grass-tile")
-              .setOrigin(0, 0).setDepth(D_MIST - 1);
+              .setOrigin(0, 0).setDepth(1000);
           addTileLayers(
             groundY + grassH, dirtH,
             ["grass-dirt-fill","grass-dirt-fill-r90","grass-dirt-fill-r180","grass-dirt-fill-r270"]
@@ -795,8 +795,8 @@ export function PlatformerGame() {
             for (const soc of theme.socials) {
               const sx = Math.round(soc.xFrac * width);
               this.socialLinks.push({ x: sx, url: soc.url });
-              // Underground stone-emblem-display + badge (centered in stone tile layer)
-              const badgeY = groundY + grassH + dirtH + 30;
+              // Stone-emblem-display + badge sitting on the ground surface, clickable
+              const badgeY = groundY - 42; // emblem bottom rests at groundY
               const badgeKeyMap: Record<string, string> = {
                 "LinkedIn": "linkedin-badge",
                 "GitHub":   "github-badge",
@@ -806,9 +806,12 @@ export function PlatformerGame() {
                 this.add.image(sx, badgeY, "stone-emblem-display")
                   .setOrigin(0.5, 0.5).setDepth(D_FGPROP);
               const badgeKey = badgeKeyMap[soc.label];
-              if (badgeKey && this.textures.exists(badgeKey))
-                this.add.image(sx, badgeY, badgeKey)
+              if (badgeKey && this.textures.exists(badgeKey)) {
+                const badgeImg = this.add.image(sx, badgeY, badgeKey)
                   .setOrigin(0.5, 0.5).setDepth(D_FGPROP + 0.1);
+                badgeImg.setInteractive({ useHandCursor: true });
+                badgeImg.on("pointerdown", () => window.open(soc.url, "_blank"));
+              }
               // Warm flicker glow behind each torch
               const glow = this.add.circle(sx, groundY - 100, 16, 0xff8820, 0.25)
                 .setDepth(D_BGFX);
