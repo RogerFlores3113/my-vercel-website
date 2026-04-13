@@ -20,6 +20,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  icons: { icon: "/icon.png" },
   title: "Roger Flores | Software Engineer",
   description:
     "Software engineer building at the intersection of full-stack development and AI. Currently exploring LLM training on consumer hardware.",
