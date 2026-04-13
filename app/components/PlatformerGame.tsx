@@ -285,18 +285,17 @@ export function PlatformerGame() {
             { key: "flowers-forest", xFrac: 0.58, yAbove: -6, scale: 1.2, flipX: true, layer: "fg" },
             { key: "flowers-forest", xFrac: 0.86, yAbove: -6, scale: 1.1, layer: "fg" },
             // fg — fern clusters (odd groupings, varying scale)
-            // yAbove = -(transparentBottomPx * scale): fern-cluster has ~3px transparent bottom
-            { key: "fern-cluster", xFrac: 0.10, yAbove: -3, scale: 1.1, layer: "fg" },
-            { key: "fern-cluster", xFrac: 0.48, yAbove: -3, scale: 0.85, flipX: true, layer: "fg" },
-            { key: "fern-cluster", xFrac: 0.88, yAbove: -4, scale: 1.3, layer: "fg" },
-            // fg — mushroom clusters near tree bases (mushrooms has ~7px transparent bottom)
-            { key: "mushrooms", xFrac: 0.32, yAbove: -6, scale: 0.9, layer: "fg" },
-            { key: "mushrooms", xFrac: 0.70, yAbove: -5, scale: 0.75, flipX: true, layer: "fg" },
-            // bg — mossy rocks scattered across ground (mossy-rocks has ~4px transparent bottom)
-            { key: "mossy-rocks", xFrac: 0.55, yAbove: -4, scale: 1.0, layer: "bg" },
-            { key: "mossy-rocks", xFrac: 0.90, yAbove: -3, scale: 0.8, flipX: true, layer: "bg" },
-            // bg — hollow fallen log (log-hollow has ~12px transparent bottom)
-            { key: "log-hollow", xFrac: 0.50, yAbove: -17, scale: 1.4, layer: "bg" },
+            { key: "fern-cluster", xFrac: 0.10, yAbove: -12, scale: 1.1, layer: "fg" },
+            { key: "fern-cluster", xFrac: 0.48, yAbove: -10, scale: 0.85, flipX: true, layer: "fg" },
+            { key: "fern-cluster", xFrac: 0.88, yAbove: -13, scale: 1.3, layer: "fg" },
+            // fg — mushroom clusters near tree bases
+            { key: "mushrooms", xFrac: 0.32, yAbove: -15, scale: 0.9, layer: "fg" },
+            { key: "mushrooms", xFrac: 0.70, yAbove: -13, scale: 0.75, flipX: true, layer: "fg" },
+            // bg — mossy rocks scattered across ground
+            { key: "mossy-rocks", xFrac: 0.55, yAbove: -12, scale: 1.0, layer: "bg" },
+            { key: "mossy-rocks", xFrac: 0.90, yAbove: -10, scale: 0.8, flipX: true, layer: "bg" },
+            // bg — hollow fallen log
+            { key: "log-hollow", xFrac: 0.50, yAbove: -27, scale: 1.4, layer: "bg" },
           ],
           vines: [
             { xFrac: 0.18, topAbove: 240 },
@@ -503,10 +502,10 @@ export function PlatformerGame() {
 
           // ── Depth constants ───────────────────────────────────────────────────
           // D_SKY=0, D_BGFX=1, D_BGPROP=2, D_GROUND=3, D_PLATFORM=4,
-          // D_VINE=5, D_PLAYER=10, D_FGPROP=15, D_SIGN=16, D_UI=20
+          // D_VINE=5, D_PLAYER=10, D_FGPROP=15, D_SIGN=16, D_UI=20, D_MIST=50
           const D_SKY = 0, D_BGFX = 1, D_BGPROP = 2, D_GROUND = 3,
                 D_PLATFORM = 4, D_VINE = 5, D_PLAYER = 10,
-                D_FGPROP = 15, D_SIGN = 16, D_UI = 20;
+                D_FGPROP = 15, D_SIGN = 16, D_UI = 20, D_MIST = 50;
 
           // ── Background ────────────────────────────────────────────────────────
           if (this.roomIndex === 0 && this.textures.exists("bg-forest")) {
@@ -566,17 +565,6 @@ export function PlatformerGame() {
           if (this.roomIndex === 0) {
             // ── Bamboo forest atmosphere ──────────────────────────────────────────
 
-            // Deep layered canopy gradient — dark crown → golden-filtered forest floor
-            const bgBands: [number, number, number, number][] = [
-              [0,             height * 0.12, 0x081208, 0.65],
-              [height * 0.08, height * 0.30, 0x0a1e0e, 0.50],
-              [height * 0.30, height * 0.28, 0x112a10, 0.35],
-              [height * 0.52, height * 0.24, 0x1a3a12, 0.18],
-            ];
-            for (const [y, h, col, a] of bgBands) {
-              this.add.rectangle(0, y, width, h, col).setOrigin(0, 0).setAlpha(a).setDepth(D_BGFX);
-            }
-
             // Bamboo leaf cap graphics (reused per stalk below)
             const canopyGfx = this.add.graphics().setDepth(D_BGFX);
 
@@ -609,10 +597,6 @@ export function PlatformerGame() {
                 delay: i * 170,
               });
             });
-
-            // Warm ground-level sunlight pool
-            this.add.rectangle(0, groundY - 55, width, 65, 0x2a5a14)
-              .setOrigin(0, 0).setAlpha(0.16).setDepth(D_BGFX);
 
             // Ground mist fallback color bands (chunky sprite mist set up below)
             if (!this.textures.exists("mist-tile")) {
@@ -678,22 +662,23 @@ export function PlatformerGame() {
 
           // ── Floating platforms ─────────────────────────────────────────────────
           this.platforms = this.physics.add.staticGroup();
+          const PLAT_H = 28; // taller = easier to see and land on
           const useWoodTile = this.textures.exists("platform-wood");
           for (const def of theme.platforms) {
             const px = Math.round(def.xFrac * width);
             const py = groundY - def.yAbove;
-            // Invisible physics body (rectangle — always needed)
-            const body = this.add.rectangle(px, py, def.w, 16, theme.platformFill, useWoodTile ? 0 : 1)
+            // Invisible physics body
+            const body = this.add.rectangle(px, py, def.w, PLAT_H, theme.platformFill, useWoodTile ? 0 : 1)
               .setDepth(D_PLATFORM);
             this.physics.add.existing(body, true);
             this.platforms.add(body);
             if (useWoodTile) {
-              // Wood tile tileSprite on top
-              this.add.tileSprite(px - def.w / 2, py - 8, def.w, 16, "platform-wood")
-                .setOrigin(0, 0).setDepth(D_PLATFORM);
+              // Wood tile tileSprite — setTileScale(0.5, 0.875) makes tiles denser horizontally
+              const ts = this.add.tileSprite(px - def.w / 2, py - PLAT_H / 2, def.w, PLAT_H, "platform-wood")
+                .setOrigin(0, 0.5).setDepth(D_PLATFORM);
+              ts.setTileScale(0.5, PLAT_H / 32); // 0.5x width = denser, fit height exactly
             } else {
-              // Fallback colored edge line
-              this.add.rectangle(px, py - 7, def.w, 2, theme.platformEdge).setDepth(D_PLATFORM);
+              this.add.rectangle(px, py - PLAT_H / 2 + 1, def.w, 2, theme.platformEdge).setDepth(D_PLATFORM);
             }
           }
 
@@ -706,9 +691,14 @@ export function PlatformerGame() {
             const vheight = def.topAbove;
             const vmid    = vtop + vheight / 2;
             if (this.textures.exists("vine-tile")) {
-              // Sprite-based vine: tileSprite repeats the 32×64 asset vertically
-              this.add.tileSprite(vx, vmid, 32, vheight, "vine-tile")
-                .setDepth(D_VINE);
+              // Stacked individual images — vine-tile is 32×96, 4px transparent top,
+              // 2px transparent bottom → overlap each tile by 6px to seal the gap
+              const VTILE_H = 96;
+              const OVERLAP = 6; // top + bottom transparent px
+              const step = VTILE_H - OVERLAP;
+              for (let vy = vtop; vy < groundY + VTILE_H; vy += step) {
+                this.add.image(vx, vy, "vine-tile").setOrigin(0.5, 0).setDepth(D_VINE);
+              }
             } else {
               // Fallback: brown stem with green leaf nodes
               this.add.rectangle(vx, vmid, 8, vheight, 0x5a3010).setDepth(D_VINE);
@@ -732,9 +722,9 @@ export function PlatformerGame() {
           // Transparent bottom padding per sign (px at scale 1); used to sink image so it sits flush
           const SIGN_SINK: Record<string, number> = {
             "sign-jungle":  6,   // 3px transparent * scale 2
-            "sign-bamboo":  6,   // ~3px transparent * scale 2
+            "sign-bamboo":  16,  // 8px transparent * scale 2
             "sign-lantern": 12,  // 6px transparent * scale 2
-            "sign-mossy":   6,   // ~3px transparent * scale 2
+            "sign-mossy":   8,   // 4px transparent * scale 2
           };
           this.signDefs  = [];
           this.signHints = [];
@@ -852,7 +842,7 @@ export function PlatformerGame() {
                 .setScale(scale)
                 .setAlpha(alpha)
                 .setAngle(angle)
-                .setDepth(D_BGFX + 0.5);
+                .setDepth(D_MIST);
               const vx = (22 + Math.random() * 28) * (Math.random() > 0.5 ? 1 : -1);
               this.mistSprites.push({ img, vx });
             }
