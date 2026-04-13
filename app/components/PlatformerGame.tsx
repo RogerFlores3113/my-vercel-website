@@ -267,31 +267,7 @@ export function PlatformerGame() {
             // Top platform (~275px)
             { xFrac: 0.50, yAbove: 275, w: 100 },
           ],
-          props: [
-            // bg — rhododendron trees
-            { key: "tree-himalaya", xFrac: 0.06, yAbove: -18, scale: 2.2, layer: "bg" },
-            { key: "tree-himalaya", xFrac: 0.91, yAbove: -18, scale: 1.8, flipX: true, layer: "bg" },
-            // bg — bamboo groves
-            { key: "bamboo", xFrac: 0.15, yAbove: -10, scale: 1.3, layer: "bg" },
-            { key: "bamboo", xFrac: 0.82, yAbove: -10, scale: 1.1, flipX: true, layer: "bg" },
-            { key: "bamboo", xFrac: 0.28, yAbove: -10, scale: 0.9, layer: "bg" },
-            // fg — flowers
-            { key: "flowers-forest", xFrac: 0.18, yAbove: -6, scale: 1.4, layer: "fg" },
-            { key: "flowers-forest", xFrac: 0.58, yAbove: -6, scale: 1.2, flipX: true, layer: "fg" },
-            { key: "flowers-forest", xFrac: 0.86, yAbove: -6, scale: 1.1, layer: "fg" },
-            // fg — fern clusters (odd groupings, varying scale)
-            { key: "fern-cluster", xFrac: 0.10, yAbove: -12, scale: 1.1, layer: "fg" },
-            { key: "fern-cluster", xFrac: 0.48, yAbove: -10, scale: 0.85, flipX: true, layer: "fg" },
-            { key: "fern-cluster", xFrac: 0.88, yAbove: -13, scale: 1.3, layer: "fg" },
-            // fg — mushroom clusters near tree bases
-            { key: "mushrooms", xFrac: 0.32, yAbove: -15, scale: 0.9, layer: "fg" },
-            { key: "mushrooms", xFrac: 0.70, yAbove: -13, scale: 0.75, flipX: true, layer: "fg" },
-            // bg — mossy rocks scattered across ground
-            { key: "mossy-rocks", xFrac: 0.55, yAbove: -12, scale: 1.0, layer: "bg" },
-            { key: "mossy-rocks", xFrac: 0.90, yAbove: -10, scale: 0.8, flipX: true, layer: "bg" },
-            // bg — hollow fallen log
-            { key: "log-hollow", xFrac: 0.50, yAbove: -27, scale: 1.4, layer: "bg" },
-          ],
+          props: [], // generated dynamically in create() based on scene width
           signs: [
             { xFrac: 0.22, modalId: "landing"  },
             { xFrac: 0.41, modalId: "projects" },
@@ -527,6 +503,10 @@ export function PlatformerGame() {
           };
           if (this.textures.exists("grass-tile"))
             this.add.tileSprite(0, groundY, width, grassH, "grass-tile").setOrigin(0,0).setDepth(D_GROUND);
+          // Thin grass edge in front of all props/player — hides sprite feet at ground line
+          if (this.textures.exists("grass-tile"))
+            this.add.tileSprite(0, groundY, width, 12, "grass-tile")
+              .setOrigin(0, 0).setDepth(D_UI - 1);
           addTileLayers(
             groundY + grassH, dirtH,
             ["grass-dirt-fill","grass-dirt-fill-r90","grass-dirt-fill-r180","grass-dirt-fill-r270"]
@@ -536,8 +516,56 @@ export function PlatformerGame() {
             ["stone-dirt-fill","stone-dirt-fill-r90","stone-dirt-fill-r180","stone-dirt-fill-r270"]
           );
 
+          // ── Resolve props: dynamic generation for room 0, static for others ────
+          // yAbove: negative = image bottom sinks below groundY (compensates for transparent padding)
+          const PROP_YABOVE: Record<string, number> = {
+            "tree-himalaya":  -18,
+            "bamboo":         -22,
+            "flowers-forest": -16,
+            "fern-cluster":   -14,
+            "mushrooms":      -18,
+            "mossy-rocks":    -13,
+            "log-hollow":     -28,
+          };
+          const PROP_LAYER: Record<string, "bg" | "fg"> = {
+            "tree-himalaya": "bg", "bamboo": "bg", "mossy-rocks": "bg", "log-hollow": "bg",
+            "flowers-forest": "fg", "fern-cluster": "fg", "mushrooms": "fg",
+          };
+          let resolvedProps: PropDef[];
+          if (this.roomIndex === 0) {
+            // Fixed anchor props — large bg features always at these positions
+            const anchors: PropDef[] = [
+              { key: "tree-himalaya", xFrac: 0.06, yAbove: -18, scale: 2.2, layer: "bg" },
+              { key: "tree-himalaya", xFrac: 0.91, yAbove: -18, scale: 1.8, flipX: true, layer: "bg" },
+              { key: "bamboo", xFrac: 0.14, yAbove: -22, scale: 1.3, layer: "bg" },
+              { key: "bamboo", xFrac: 0.82, yAbove: -22, scale: 1.1, flipX: true, layer: "bg" },
+              { key: "bamboo", xFrac: 0.27, yAbove: -22, scale: 0.9, layer: "bg" },
+            ];
+            // Ground-cover pool — small decorative sprites randomly dispersed
+            const poolKeys = ["flowers-forest", "fern-cluster", "mushrooms", "mossy-rocks", "log-hollow"]
+              .filter(k => this.textures.exists(k));
+            // 1 prop per ~70px of width, min 4
+            const coverCount = Math.max(4, Math.round(width / 70));
+            const coverProps: PropDef[] = Array.from({ length: coverCount }, (_, i) => {
+              // Jitter within evenly divided slots so spacing feels organic, not clustered
+              const xFrac = (i + 0.15 + Math.random() * 0.70) / coverCount;
+              const key   = poolKeys[Math.floor(Math.random() * poolKeys.length)];
+              return {
+                key,
+                xFrac,
+                yAbove: PROP_YABOVE[key] ?? -14,
+                scale:  0.8 + Math.random() * 0.55,
+                flipX:  Math.random() > 0.5,
+                layer:  PROP_LAYER[key] ?? "fg",
+              };
+            });
+            resolvedProps = [...anchors, ...coverProps];
+          } else {
+            resolvedProps = theme.props;
+          }
+
           // ── Background props (trees, terminals, shelves — behind player) ───────
-          for (const prop of theme.props.filter(p => (p.layer ?? "bg") === "bg")) {
+          for (const prop of resolvedProps.filter(p => (p.layer ?? "bg") === "bg")) {
             if (!this.textures.exists(prop.key)) continue;
             const img = this.add.image(
               Math.round(prop.xFrac * width),
@@ -596,6 +624,11 @@ export function PlatformerGame() {
               .setDepth(D_PLATFORM);
             this.physics.add.existing(body, true);
             this.platforms.add(body);
+            // One-way: only collide from above — no sideways / bottom bumping
+            const platBody = body.body as Phaser.Physics.Arcade.StaticBody;
+            platBody.checkCollision.left  = false;
+            platBody.checkCollision.right = false;
+            platBody.checkCollision.down  = false;
             if (useWoodTile) {
               // Wood tile tileSprite — setTileScale(0.5, 0.875) makes tiles denser horizontally
               const ts = this.add.tileSprite(px, py, def.w, PLAT_H, "platform-wood")
@@ -627,10 +660,10 @@ export function PlatformerGame() {
           const availableSignKeys = SIGN_KEYS.filter(k => this.textures.exists(k));
           // Transparent bottom padding per sign (px at scale 1); used to sink image so it sits flush
           const SIGN_SINK: Record<string, number> = {
-            "sign-jungle":  6,   // 3px transparent * scale 2
-            "sign-bamboo":  16,  // 8px transparent * scale 2
-            "sign-lantern": 12,  // 6px transparent * scale 2
-            "sign-mossy":   8,   // 4px transparent * scale 2
+            "sign-jungle":  14,
+            "sign-bamboo":  24,
+            "sign-lantern": 20,
+            "sign-mossy":   16,
           };
           this.signDefs  = [];
           this.signHints = [];
@@ -785,7 +818,7 @@ export function PlatformerGame() {
           );
 
           // ── Foreground props (flowers etc. — in front of player) ──────────────
-          for (const prop of theme.props.filter(p => p.layer === "fg")) {
+          for (const prop of resolvedProps.filter(p => p.layer === "fg")) {
             if (!this.textures.exists(prop.key)) continue;
             const img = this.add.image(
               Math.round(prop.xFrac * width),
