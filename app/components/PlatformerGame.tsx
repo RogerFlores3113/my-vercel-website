@@ -357,6 +357,8 @@ export function PlatformerGame() {
         // Mist (chunky individual sprites)
         private mistSprites: Array<{ img: Phaser.GameObjects.Image; vx: number }> = [];
 
+        private lastInputTime = 0;   // ms timestamp of last key press
+        private readonly IDLE_DELAY  = 3000; // ms before idle animation kicks in
         private readonly SPEED   = 180;
         private readonly JUMP_VY = -600;
 
@@ -370,6 +372,7 @@ export function PlatformerGame() {
         init(data: Record<string, unknown>) {
           this.entryFromLeft  = (data.fromLeft as boolean) !== false;
           this.transitioning  = false;
+          this.lastInputTime  = 0;
           this.signDefs       = [];
           this.signHints      = [];
           this.activeSignIdx  = -1;
@@ -538,7 +541,7 @@ export function PlatformerGame() {
             // Fixed anchor props — large statement bg features
             const anchors: PropDef[] = [
               // Tall fir tree centred in the scene (falls back to tree-himalaya if not loaded yet)
-              { key: "tree-himalaya", xFrac: 0.50, yAbove: -60, scale: 3.0, layer: "bg" },
+              { key: "tree-himalaya", xFrac: 0.50, yAbove: -60, scale: 4.5, layer: "bg" },
               // Bamboo groves at the far sides
               { key: "bamboo", xFrac: 0.10, yAbove: -27, scale: 1.3, layer: "bg" },
               { key: "bamboo", xFrac: 0.88, yAbove: -27, scale: 1.1, flipX: true, layer: "bg" },
@@ -738,10 +741,10 @@ export function PlatformerGame() {
             const hint = this.add.text(sx, hintY, "[ ENTER ]", {
               fontFamily: "Arial, Helvetica, sans-serif",
               fontStyle: "bold",
-              fontSize: "15px",
+              fontSize: "11px",
               color: "#ffffff",
               stroke: "#1a3a10",
-              strokeThickness: 4,
+              strokeThickness: 2,
             }).setOrigin(0.5).setAlpha(0).setDepth(D_UI);
             this.signHints.push(hint);
           }
@@ -914,6 +917,12 @@ export function PlatformerGame() {
 
           const speed = sprint ? this.SPEED * 1.75 : this.SPEED;
 
+          // Track last input time — any directional or jump key resets the idle timer
+          const anyInput = left || right || jumpPressed;
+          if (anyInput) this.lastInputTime = this.time.now;
+          const idleReady = onGround && !left && !right &&
+            (this.time.now - this.lastInputTime) >= this.IDLE_DELAY;
+
           // ── Normal movement ────────────────────────────────────────────────────
           if (left)       { body.setVelocityX(-speed); this.player.setFlipX(true); }
           else if (right) { body.setVelocityX(speed);  this.player.setFlipX(false); }
@@ -921,13 +930,18 @@ export function PlatformerGame() {
 
           if (jumpPressed && onGround) body.setVelocityY(this.JUMP_VY);
 
-          // Animation state machine — play(key, true) = don't restart if already playing
+          // Animation state machine
           if (!onGround) {
             this.player.play("Jump", true);
           } else if (left || right) {
             this.player.play(sprint ? "Run" : "Walk", true);
-          } else {
+          } else if (idleReady) {
+            // After IDLE_DELAY of no input — play the looping idle fidget animation
             this.player.play("Idle", true);
+          } else {
+            // Just stopped — freeze on standing pose (frame 0 of idle sprite)
+            this.player.anims.stop();
+            this.player.setTexture("rp2-idle-east-0");
           }
 
           // Mist drift (chunky individual images)
