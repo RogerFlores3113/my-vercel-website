@@ -409,6 +409,7 @@ export function PlatformerGame() {
 
           // ── Prop textures — load once, skip if already cached ────────────────
           const propAssets: [string, string][] = [
+            ["fir-tree",         "/props/fir-tree.png"],
             ["tree-himalaya",    "/props/tree-himalaya.png"],
             ["bamboo",           "/props/bamboo.png"],
             ["flowers-forest",   "/props/flowers-forest.png"],
@@ -519,42 +520,43 @@ export function PlatformerGame() {
           // ── Resolve props: dynamic generation for room 0, static for others ────
           // yAbove: negative = image bottom sinks below groundY (compensates for transparent padding)
           const PROP_YABOVE: Record<string, number> = {
-            "tree-himalaya":  -18,
-            "bamboo":         -22,
-            "flowers-forest": -16,
-            "fern-cluster":   -14,
-            "mushrooms":      -18,
-            "mossy-rocks":    -13,
-            "log-hollow":     -28,
+            "tree-himalaya":  -23,
+            "fir-tree":       -30,
+            "bamboo":         -27,
+            "flowers-forest": -21,
+            "fern-cluster":   -19,
+            "mushrooms":      -23,
+            "mossy-rocks":    -18,
+            "log-hollow":     -33,
           };
           const PROP_LAYER: Record<string, "bg" | "fg"> = {
-            "tree-himalaya": "bg", "bamboo": "bg", "mossy-rocks": "bg", "log-hollow": "bg",
+            "fir-tree": "bg", "tree-himalaya": "bg", "bamboo": "bg", "mossy-rocks": "bg", "log-hollow": "bg",
             "flowers-forest": "fg", "fern-cluster": "fg", "mushrooms": "fg",
           };
           let resolvedProps: PropDef[];
           if (this.roomIndex === 0) {
-            // Fixed anchor props — large bg features always at these positions
+            // Fixed anchor props — large statement bg features
             const anchors: PropDef[] = [
-              { key: "tree-himalaya", xFrac: 0.06, yAbove: -18, scale: 2.2, layer: "bg" },
-              { key: "tree-himalaya", xFrac: 0.91, yAbove: -18, scale: 1.8, flipX: true, layer: "bg" },
-              { key: "bamboo", xFrac: 0.14, yAbove: -22, scale: 1.3, layer: "bg" },
-              { key: "bamboo", xFrac: 0.82, yAbove: -22, scale: 1.1, flipX: true, layer: "bg" },
-              { key: "bamboo", xFrac: 0.27, yAbove: -22, scale: 0.9, layer: "bg" },
+              // Tall fir tree centred in the scene (falls back to tree-himalaya if not loaded yet)
+              this.textures.exists("fir-tree")
+                ? { key: "fir-tree",      xFrac: 0.50, yAbove: -30, scale: 1.6,  layer: "bg" }
+                : { key: "tree-himalaya", xFrac: 0.50, yAbove: -23, scale: 2.0,  layer: "bg" },
+              // Bamboo groves at the far sides
+              { key: "bamboo", xFrac: 0.10, yAbove: -27, scale: 1.3, layer: "bg" },
+              { key: "bamboo", xFrac: 0.88, yAbove: -27, scale: 1.1, flipX: true, layer: "bg" },
             ];
-            // Ground-cover pool — small decorative sprites randomly dispersed
+            // Ground-cover pool — sparse; 1 prop per ~180px, min 2
             const poolKeys = ["flowers-forest", "fern-cluster", "mushrooms", "mossy-rocks", "log-hollow"]
               .filter(k => this.textures.exists(k));
-            // 1 prop per ~70px of width, min 4
-            const coverCount = Math.max(4, Math.round(width / 70));
+            const coverCount = Math.max(2, Math.round(width / 180));
             const coverProps: PropDef[] = Array.from({ length: coverCount }, (_, i) => {
-              // Jitter within evenly divided slots so spacing feels organic, not clustered
-              const xFrac = (i + 0.15 + Math.random() * 0.70) / coverCount;
+              const xFrac = (i + 0.2 + Math.random() * 0.60) / coverCount;
               const key   = poolKeys[Math.floor(Math.random() * poolKeys.length)];
               return {
                 key,
                 xFrac,
-                yAbove: PROP_YABOVE[key] ?? -14,
-                scale:  0.8 + Math.random() * 0.55,
+                yAbove: PROP_YABOVE[key] ?? -19,
+                scale:  0.85 + Math.random() * 0.45,
                 flipX:  Math.random() > 0.5,
                 layer:  PROP_LAYER[key] ?? "fg",
               };
@@ -660,10 +662,23 @@ export function PlatformerGame() {
           const availableSignKeys = SIGN_KEYS.filter(k => this.textures.exists(k));
           // Transparent bottom padding per sign (px at scale 1); used to sink image so it sits flush
           const SIGN_SINK: Record<string, number> = {
-            "sign-jungle":  14,
-            "sign-bamboo":  24,
-            "sign-lantern": 20,
-            "sign-mossy":   16,
+            "sign-jungle":  19,
+            "sign-bamboo":  29,
+            "sign-lantern": 25,
+            "sign-mossy":   21,
+          };
+          // Per-sign label Y offset relative to groundY, and optional color override
+          const SIGN_LABEL_Y: Record<string, number> = {
+            "landing":  groundY - 70,  // "About Me" — lower on the board
+            "projects": groundY - 70,  // "Projects" — lower on the board
+            "about":    groundY - 83,  // "Now" — compensate for 5px sink
+            "reading":  groundY - 100, // "Reading" — pull upward
+          };
+          const SIGN_LABEL_COLOR: Record<string, string> = {
+            "landing":  "#111111",
+            "projects": "#111111",
+            "about":    "#d4c8a0",
+            "reading":  "#d4c8a0",
           };
           this.signDefs  = [];
           this.signHints = [];
@@ -682,8 +697,10 @@ export function PlatformerGame() {
                 .setOrigin(0.5, 1).setScale(2).setDepth(D_SIGN);
               // Label on board
               const label = SIGN_NAMES[sd.modalId] ?? "ENT";
-              this.add.text(sx, groundY - 88, label, {
-                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "13px", color: "#d4c8a0",
+              const labelY     = SIGN_LABEL_Y[sd.modalId]     ?? groundY - 88;
+              const labelColor = SIGN_LABEL_COLOR[sd.modalId] ?? "#d4c8a0";
+              this.add.text(sx, labelY, label, {
+                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "13px", color: labelColor,
               }).setOrigin(0.5).setDepth(D_SIGN + 0.1);
             } else {
               this.add.rectangle(sx, groundY - 18, 5, 34, 0x4a2a0a).setDepth(D_SIGN);
