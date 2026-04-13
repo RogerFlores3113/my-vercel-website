@@ -233,7 +233,6 @@ export function PlatformerGame() {
       // ── Room visual themes + platform layouts ─────────────────────────────────
       type PlatformDef = { xFrac: number; yAbove: number; w: number };
       type PropDef = { key: string; xFrac: number; yAbove: number; scale?: number; flipX?: boolean; layer?: "bg" | "fg" };
-      type VineDef   = { xFrac: number; topAbove: number };
       type SignDef   = { xFrac: number; modalId: string };
       type SocialDef = { xFrac: number; url: string; label: string };
       type RoomTheme = {
@@ -242,7 +241,6 @@ export function PlatformerGame() {
         labelColor: string; arrowColor: string;
         platforms: PlatformDef[];
         props: PropDef[];
-        vines: VineDef[];
         signs: SignDef[];
         socials?: SocialDef[];
         spawnXFrac?: number;
@@ -277,10 +275,7 @@ export function PlatformerGame() {
             { key: "bamboo", xFrac: 0.15, yAbove: -10, scale: 1.3, layer: "bg" },
             { key: "bamboo", xFrac: 0.82, yAbove: -10, scale: 1.1, flipX: true, layer: "bg" },
             { key: "bamboo", xFrac: 0.28, yAbove: -10, scale: 0.9, layer: "bg" },
-            // fg — jungle bushes + flowers
-            { key: "bg-jungle", xFrac: 0.03, yAbove: -4, scale: 1.1, layer: "fg" },
-            { key: "bg-jungle", xFrac: 0.72, yAbove: -4, scale: 0.9, flipX: true, layer: "fg" },
-            { key: "bg-jungle", xFrac: 0.96, yAbove: -4, scale: 1.0, layer: "fg" },
+            // fg — flowers
             { key: "flowers-forest", xFrac: 0.18, yAbove: -6, scale: 1.4, layer: "fg" },
             { key: "flowers-forest", xFrac: 0.58, yAbove: -6, scale: 1.2, flipX: true, layer: "fg" },
             { key: "flowers-forest", xFrac: 0.86, yAbove: -6, scale: 1.1, layer: "fg" },
@@ -296,12 +291,6 @@ export function PlatformerGame() {
             { key: "mossy-rocks", xFrac: 0.90, yAbove: -10, scale: 0.8, flipX: true, layer: "bg" },
             // bg — hollow fallen log
             { key: "log-hollow", xFrac: 0.50, yAbove: -27, scale: 1.4, layer: "bg" },
-          ],
-          vines: [
-            { xFrac: 0.18, topAbove: 240 },
-            { xFrac: 0.38, topAbove: 190 },
-            { xFrac: 0.62, topAbove: 190 },
-            { xFrac: 0.82, topAbove: 240 },
           ],
           signs: [
             { xFrac: 0.22, modalId: "landing"  },
@@ -323,7 +312,6 @@ export function PlatformerGame() {
             { xFrac: 0.88, yAbove: 50, w: 80 },  // step right
           ],
           props: [],
-          vines: [],
           signs: [],
           socials: [
             { xFrac: 0.25, url: "https://www.linkedin.com/in/roger-flores-3113-nu/", label: "LinkedIn" },
@@ -361,12 +349,6 @@ export function PlatformerGame() {
             frameRate: 8,
             repeat: -1,
           });
-          this.anims.create({
-            key: "ClimbN",
-            frames: Array.from({ length: 4 }, (_, i) => ({ key: `rp2-climb-north-${i}` })),
-            frameRate: 8,
-            repeat: -1,
-          });
         }
       }
 
@@ -396,11 +378,6 @@ export function PlatformerGame() {
         private transitioning = false;
         private entryFromLeft = true;
         private platforms!: Phaser.Physics.Arcade.StaticGroup;
-        // Vines
-        private vineZones: Phaser.GameObjects.Rectangle[] = [];
-        private onVine     = false;
-        private activeVineX = 0;
-        private vineDetachTime = 0;  // timestamp ms — cooldown after detaching
         // Mist (chunky individual sprites)
         private mistSprites: Array<{ img: Phaser.GameObjects.Image; vx: number }> = [];
 
@@ -424,8 +401,6 @@ export function PlatformerGame() {
           this.socialHints    = [];
           this.activeSocial   = -1;
           this.mistSprites    = [];
-          this.onVine         = false;
-          this.vineDetachTime = 0;
         }
 
         preload() {
@@ -461,7 +436,6 @@ export function PlatformerGame() {
             ["tree-himalaya",    "/props/tree-himalaya.png"],
             ["bamboo",           "/props/bamboo.png"],
             ["flowers-forest",   "/props/flowers-forest.png"],
-            ["vine-tile",        "/props/vine-tile.png"],
             ["sign-mossy",       "/props/sign-mossy.png"],
             ["sign-jungle",      "/props/sign-jungle.png"],
             ["sign-bamboo",      "/props/sign-bamboo.png"],
@@ -483,8 +457,9 @@ export function PlatformerGame() {
             ["stone-dirt-fill-r90",  "/props/stone-dirt-fill_r90.png"],
             ["stone-dirt-fill-r180", "/props/stone-dirt-fill_r180.png"],
             ["stone-dirt-fill-r270", "/props/stone-dirt-fill_r270.png"],
-            ["bg-jungle",         "/props/bg-jungle.png"],
             ["mist-tile",        "/props/mist-tile.png"],
+            ["mist-cloud-a",     "/props/mist-cloud-a.png"],
+            ["mist-cloud-b",     "/props/mist-cloud-b.png"],
             ["terminal-tech",    "/props/terminal-tech.png"],
             ["books-reading",    "/props/books-reading.png"],
             ["tree-forest",      "/props/tree-forest.png"],
@@ -502,9 +477,9 @@ export function PlatformerGame() {
 
           // ── Depth constants ───────────────────────────────────────────────────
           // D_SKY=0, D_BGFX=1, D_BGPROP=2, D_GROUND=3, D_PLATFORM=4,
-          // D_VINE=5, D_PLAYER=10, D_FGPROP=15, D_SIGN=16, D_UI=20, D_MIST=50
+          // D_PLAYER=10, D_FGPROP=15, D_SIGN=16, D_UI=20, D_MIST=50
           const D_SKY = 0, D_BGFX = 1, D_BGPROP = 2, D_GROUND = 3,
-                D_PLATFORM = 4, D_VINE = 5, D_PLAYER = 10,
+                D_PLATFORM = 4, D_PLAYER = 10,
                 D_FGPROP = 15, D_SIGN = 16, D_UI = 20, D_MIST = 50;
 
           // ── Background ────────────────────────────────────────────────────────
@@ -682,33 +657,34 @@ export function PlatformerGame() {
             }
           }
 
-          // ── Vines ─────────────────────────────────────────────────────────────
-          this.vineZones = [];
-          this.onVine    = false;
-          for (const def of theme.vines) {
-            const vx      = Math.round(def.xFrac * width);
-            const vtop    = groundY - def.topAbove;
-            const vheight = def.topAbove;
-            const vmid    = vtop + vheight / 2;
-            if (this.textures.exists("vine-tile")) {
-              // Stacked individual images — vine-tile is 32×96, 4px transparent top,
-              // 2px transparent bottom → overlap each tile by 6px to seal the gap
-              const VTILE_H = 96;
-              const OVERLAP = 6; // top + bottom transparent px
-              const step = VTILE_H - OVERLAP;
-              for (let vy = vtop; vy < groundY + VTILE_H; vy += step) {
-                this.add.image(vx, vy, "vine-tile").setOrigin(0.5, 0).setDepth(D_VINE);
+          // ── Connecting rope — tan line through all platforms, behind wood sprites ─
+          if (theme.platforms.length > 1) {
+            const ropeGfx = this.add.graphics().setDepth(D_PLATFORM - 0.5);
+            // Sort platforms by x position
+            const sortedPlats = [...theme.platforms].sort((a, b) => a.xFrac - b.xFrac);
+            for (let pi = 0; pi < sortedPlats.length - 1; pi++) {
+              const p1 = sortedPlats[pi];
+              const p2 = sortedPlats[pi + 1];
+              const x1 = Math.round(p1.xFrac * width) + p1.w / 2;
+              const x2 = Math.round(p2.xFrac * width) - p2.w / 2;
+              const y1 = groundY - p1.yAbove;
+              const y2 = groundY - p2.yAbove;
+              const dist = Math.abs(x2 - x1);
+              const sag  = dist * 0.07;
+              const midX = (x1 + x2) / 2;
+              const ctrlY = Math.max(y1, y2) + sag;
+              // Draw quadratic bezier manually (Phaser Graphics has no built-in method)
+              ropeGfx.lineStyle(2, 0xc8a060, 0.90);
+              ropeGfx.beginPath();
+              const STEPS = 16;
+              for (let t = 0; t <= STEPS; t++) {
+                const u = t / STEPS;
+                const bx = (1-u)*(1-u)*x1 + 2*(1-u)*u*midX + u*u*x2;
+                const by = (1-u)*(1-u)*y1 + 2*(1-u)*u*ctrlY + u*u*y2;
+                if (t === 0) ropeGfx.moveTo(bx, by); else ropeGfx.lineTo(bx, by);
               }
-            } else {
-              // Fallback: brown stem with green leaf nodes
-              this.add.rectangle(vx, vmid, 8, vheight, 0x5a3010).setDepth(D_VINE);
-              for (let ny = vtop + 10; ny < groundY; ny += 20) {
-                this.add.rectangle(vx, ny, 14, 4, 0x3a7a18).setDepth(D_VINE);
-              }
+              ropeGfx.strokePath();
             }
-            // Invisible grab zone (wider than visual for easy grabbing)
-            const zone = this.add.rectangle(vx, vmid, 32, vheight, 0x00ff00, 0);
-            this.vineZones.push(zone);
           }
 
           // ── Signs (modal triggers) ────────────────────────────────────────────
@@ -830,21 +806,27 @@ export function PlatformerGame() {
 
           // ── Chunky mist sprites (room 0) ─────────────────────────────────────
           this.mistSprites = [];
-          if (this.roomIndex === 0 && this.textures.exists("mist-tile")) {
-            const mistCount = 45 + Math.floor(Math.random() * 10); // 45-54
-            for (let m = 0; m < mistCount; m++) {
-              const mx    = Math.random() * width;
-              const my    = groundY - 15 - Math.random() * 70;
-              const scale = 1.0 + Math.random() * 2.2;
-              const alpha = 0.13 + Math.random() * 0.22;
-              const angle = Math.random() * 360;
-              const img   = this.add.image(mx, my, "mist-tile")
-                .setScale(scale)
-                .setAlpha(alpha)
-                .setAngle(angle)
-                .setDepth(D_MIST);
-              const vx = (22 + Math.random() * 28) * (Math.random() > 0.5 ? 1 : -1);
-              this.mistSprites.push({ img, vx });
+          if (this.roomIndex === 0) {
+            // Pool of mist texture keys — use whichever are loaded
+            const mistKeys = ["mist-tile", "mist-cloud-a", "mist-cloud-b"]
+              .filter(k => this.textures.exists(k));
+            if (mistKeys.length > 0) {
+              const mistCount = 45 + Math.floor(Math.random() * 10); // 45-54
+              for (let m = 0; m < mistCount; m++) {
+                const key   = mistKeys[m % mistKeys.length];
+                const mx    = Math.random() * width;
+                const my    = groundY - 15 - Math.random() * 70;
+                const scale = 1.0 + Math.random() * 2.2;
+                const alpha = 0.10 + Math.random() * 0.20;
+                const angle = Math.random() * 30 - 15; // gentle tilt, not full rotation
+                const img   = this.add.image(mx, my, key)
+                  .setScale(scale)
+                  .setAlpha(alpha)
+                  .setAngle(angle)
+                  .setDepth(D_MIST);
+                const vx = (22 + Math.random() * 28) * (Math.random() > 0.5 ? 1 : -1);
+                this.mistSprites.push({ img, vx });
+              }
             }
           }
 
@@ -930,56 +912,6 @@ export function PlatformerGame() {
             Phaser.Input.Keyboard.JustDown(this.jumpKey);
 
           const speed = sprint ? this.SPEED * 1.75 : this.SPEED;
-
-          // ── Vine logic ─────────────────────────────────────────────────────────
-          let touchingVine = false;
-          const pb = this.player.getBounds();
-          for (const zone of this.vineZones) {
-            const zb = zone.getBounds();
-            if (Phaser.Geom.Intersects.RectangleToRectangle(pb, zb)) {
-              touchingVine = true;
-              this.activeVineX = zone.x;
-              break;
-            }
-          }
-
-          // Grab: touching vine, pressing up, and cooldown elapsed (prevents instant re-grab after jump)
-          const canGrab = touchingVine && Date.now() - this.vineDetachTime > 400;
-          if (canGrab && up && !this.onVine) {
-            this.onVine = true;
-          }
-          // Drop: physically left the vine zone
-          if (this.onVine && !touchingVine) {
-            this.onVine = false;
-            body.allowGravity = true;
-          }
-
-          if (this.onVine) {
-            body.allowGravity = false;
-            // No X manipulation — player stays wherever they grabbed the vine
-
-            if (up)        body.setVelocityY(-120);
-            else if (down) body.setVelocityY(100);
-            else           body.setVelocityY(0);
-
-            // Jump off vine: give upward + directional velocity, set cooldown
-            if (jumpPressed) {
-              this.onVine          = false;
-              this.vineDetachTime  = Date.now();
-              body.allowGravity    = true;
-              body.setVelocityY(this.JUMP_VY * 0.85);
-              const dir = left ? -1 : right ? 1 : (this.player.flipX ? -1 : 1);
-              body.setVelocityX(dir * speed);
-            } else {
-              // ClimbN animation (north-facing frames, no flipX)
-              const anim = this.player.anims.currentAnim?.key;
-              if (up || down) { if (anim !== "ClimbN") { this.player.play("ClimbN", true); this.player.setFlipX(false); } }
-              else            { if (anim !== "Idle")   this.player.play("Idle", true); }
-              return; // vine handles movement; skip normal update
-            }
-          } else {
-            body.allowGravity = true;
-          }
 
           // ── Normal movement ────────────────────────────────────────────────────
           if (left)       { body.setVelocityX(-speed); this.player.setFlipX(true); }
