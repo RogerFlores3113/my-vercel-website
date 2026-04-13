@@ -539,7 +539,7 @@ export function PlatformerGame() {
             const anchors: PropDef[] = [
               // Tall fir tree centred in the scene (falls back to tree-himalaya if not loaded yet)
               this.textures.exists("fir-tree")
-                ? { key: "fir-tree",      xFrac: 0.50, yAbove: -30, scale: 1.6,  layer: "bg" }
+                ? { key: "fir-tree",      xFrac: 0.50, yAbove: -30, scale: 3.5,  layer: "bg" }
                 : { key: "tree-himalaya", xFrac: 0.50, yAbove: -23, scale: 2.0,  layer: "bg" },
               // Bamboo groves at the far sides
               { key: "bamboo", xFrac: 0.10, yAbove: -27, scale: 1.3, layer: "bg" },
@@ -700,7 +700,10 @@ export function PlatformerGame() {
               const labelY     = SIGN_LABEL_Y[sd.modalId]     ?? groundY - 88;
               const labelColor = SIGN_LABEL_COLOR[sd.modalId] ?? "#d4c8a0";
               this.add.text(sx, labelY, label, {
-                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "13px", color: labelColor,
+                fontFamily: "Arial, Helvetica, sans-serif",
+                fontStyle: "bold",
+                fontSize: "13px",
+                color: labelColor,
               }).setOrigin(0.5).setDepth(D_SIGN + 0.1);
             } else {
               this.add.rectangle(sx, groundY - 18, 5, 34, 0x4a2a0a).setDepth(D_SIGN);
@@ -708,7 +711,10 @@ export function PlatformerGame() {
                 .setStrokeStyle(2, 0xb07840).setDepth(D_SIGN);
               this.add.rectangle(sx, boardY, 82, 28, 0x8f5e2a).setDepth(D_SIGN);
               this.add.text(sx, boardY, SIGN_NAMES[sd.modalId] ?? "ENT", {
-                fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "13px", color: "#d4a06a",
+                fontFamily: "Arial, Helvetica, sans-serif",
+                fontStyle: "bold",
+                fontSize: "13px",
+                color: "#d4a06a",
               }).setOrigin(0.5).setDepth(D_SIGN);
             }
             const hint = this.add.text(sx, boardY - 24, "[ ENTER ]", {
