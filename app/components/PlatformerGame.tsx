@@ -446,9 +446,13 @@ export function PlatformerGame() {
             ["mushrooms",        "/props/mushrooms.png"],
             ["mossy-rocks",      "/props/mossy-rocks.png"],
             ["log-hollow",       "/props/log-hollow.png"],
-            ["statue-linkedin",  "/props/statue-linkedin.png"],
-            ["statue-github",    "/props/statue-github.png"],
-            ["statue-email",     "/props/statue-email.png"],
+            ["statue-linkedin",      "/props/statue-linkedin.png"],
+            ["statue-github",        "/props/statue-github.png"],
+            ["statue-email",         "/props/statue-email.png"],
+            ["stone-emblem-display", "/props/stone-emblem-display.png"],
+            ["github-badge",         "/props/github-badge.png"],
+            ["linkedin-badge",       "/props/linkedin-badge.png"],
+            ["gmail-badge",          "/props/gmail-badge.png"],
             ["grass-tile",           "/props/grass-tile.png"],
             ["platform-wood",        "/props/platform-wood.png"],
             ["grass-dirt-fill",      "/props/grass-dirt-fill.png"],
@@ -791,22 +795,20 @@ export function PlatformerGame() {
             for (const soc of theme.socials) {
               const sx = Math.round(soc.xFrac * width);
               this.socialLinks.push({ x: sx, url: soc.url });
-              // Statue image or placeholder pillar
-              const statueKeyMap: Record<string, string> = {
-                "LinkedIn": "statue-linkedin",
-                "GitHub":   "statue-github",
-                "Email":    "statue-email",
+              // Underground stone-emblem-display + badge (centered in stone tile layer)
+              const badgeY = groundY + grassH + dirtH + 30;
+              const badgeKeyMap: Record<string, string> = {
+                "LinkedIn": "linkedin-badge",
+                "GitHub":   "github-badge",
+                "Email":    "gmail-badge",
               };
-              const statueKey = statueKeyMap[soc.label];
-              if (statueKey && this.textures.exists(statueKey)) {
-                this.add.image(sx, groundY, statueKey)
-                  .setOrigin(0.5, 1).setScale(2).setDepth(D_FGPROP);
-              } else {
-                this.add.rectangle(sx, groundY, 28, 80, 0x5a3c1e)
-                  .setOrigin(0.5, 1).setDepth(D_FGPROP);
-                this.add.rectangle(sx, groundY - 80, 40, 14, 0x8a6030)
-                  .setOrigin(0.5, 1).setDepth(D_FGPROP);
-              }
+              if (this.textures.exists("stone-emblem-display"))
+                this.add.image(sx, badgeY, "stone-emblem-display")
+                  .setOrigin(0.5, 0.5).setDepth(D_FGPROP);
+              const badgeKey = badgeKeyMap[soc.label];
+              if (badgeKey && this.textures.exists(badgeKey))
+                this.add.image(sx, badgeY, badgeKey)
+                  .setOrigin(0.5, 0.5).setDepth(D_FGPROP + 0.1);
               // Warm flicker glow behind each torch
               const glow = this.add.circle(sx, groundY - 100, 16, 0xff8820, 0.25)
                 .setDepth(D_BGFX);
