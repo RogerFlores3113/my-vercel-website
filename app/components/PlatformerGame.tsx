@@ -425,6 +425,7 @@ export function PlatformerGame() {
             ["sign-jungle",      "/props/sign-jungle.png"],
             ["sign-bamboo",      "/props/sign-bamboo.png"],
             ["sign-lantern",     "/props/sign-lantern.png"],
+            ["sign-now",         "/props/sign-now.png"],
             ["fern-cluster",     "/props/fern-cluster.png"],
             ["mushrooms",        "/props/mushrooms.png"],
             ["mossy-rocks",      "/props/mossy-rocks.png"],
@@ -488,45 +489,49 @@ export function PlatformerGame() {
           const grassH = 32;
           const dirtH  = 64;
           const stoneH = Math.max(32, totalGroundH - grassH - dirtH);
+          // Depths for ground layers — must sit above player (D_PLAYER=10), signs (D_SIGN=16), badges (D_FGPROP=15)
+          const D_GRASS_BACK = 800;  // grass backing rect
+          const D_GRASS      = 850;  // grass tile layer
+          const D_DIRT_BACK  = 700;  // dirt backing rect
+          const D_DIRT       = 750;  // dirt tile layers
           // Backings — skip grass backing for room 0 (forest bg shows through fine)
           const hasBgImage = this.roomIndex === 0 && this.textures.exists("bg-forest");
           if (!hasBgImage)
-            this.add.rectangle(0, groundY, width, grassH, 0x3a7a18).setOrigin(0, 0).setDepth(D_GROUND - 0.1);
-          this.add.rectangle(0, groundY + grassH,          width, dirtH,  0x6b3a1a).setOrigin(0, 0).setDepth(D_GROUND - 0.1);
+            this.add.rectangle(0, groundY, width, grassH, 0x3a7a18).setOrigin(0, 0).setDepth(D_GRASS_BACK);
+          this.add.rectangle(0, groundY + grassH,          width, dirtH,  0x6b3a1a).setOrigin(0, 0).setDepth(D_DIRT_BACK);
           this.add.rectangle(0, groundY + grassH + dirtH,  width, stoneH, 0x2e2e2e).setOrigin(0, 0).setDepth(D_GROUND - 0.1);
-          // Tiles on top of backings — 4 rotations layered at offsets to kill gaps + add variety
+          // Dirt tile layers — above player/signs/badges but below grass
           const tileW = 32;
           const addTileLayers = (
             y: number, h: number,
-            keys: [string, string, string, string]
+            keys: [string, string, string, string],
+            baseDepth: number
           ) => {
             const [k0, k90, k180, k270] = keys;
             if (!this.textures.exists(k0)) return;
-            // 0°  starting at x=0
-            this.add.tileSprite(0,            y, width,            h, k0  ).setOrigin(0,0).setDepth(D_GROUND);
-            // 90° offset by 1/4 tile
+            this.add.tileSprite(0,            y, width,            h, k0  ).setOrigin(0,0).setDepth(baseDepth);
             if (this.textures.exists(k90))
-              this.add.tileSprite(-tileW*0.25, y, width+tileW*0.25, h, k90 ).setOrigin(0,0).setDepth(D_GROUND).setAlpha(0.6);
-            // 180° offset by 1/2 tile
+              this.add.tileSprite(-tileW*0.25, y, width+tileW*0.25, h, k90 ).setOrigin(0,0).setDepth(baseDepth).setAlpha(0.6);
             if (this.textures.exists(k180))
-              this.add.tileSprite(-tileW*0.5,  y, width+tileW*0.5,  h, k180).setOrigin(0,0).setDepth(D_GROUND).setAlpha(0.45);
-            // 270° offset by 3/4 tile
+              this.add.tileSprite(-tileW*0.5,  y, width+tileW*0.5,  h, k180).setOrigin(0,0).setDepth(baseDepth).setAlpha(0.45);
             if (this.textures.exists(k270))
-              this.add.tileSprite(-tileW*0.75, y, width+tileW*0.75, h, k270).setOrigin(0,0).setDepth(D_GROUND).setAlpha(0.3);
+              this.add.tileSprite(-tileW*0.75, y, width+tileW*0.75, h, k270).setOrigin(0,0).setDepth(baseDepth).setAlpha(0.3);
           };
           if (this.textures.exists("grass-tile"))
-            this.add.tileSprite(0, groundY, width, grassH, "grass-tile").setOrigin(0,0).setDepth(D_GROUND);
+            this.add.tileSprite(0, groundY, width, grassH, "grass-tile").setOrigin(0,0).setDepth(D_GRASS);
           // Thin grass edge — absolute front of scene (above mist, player, everything)
           if (this.textures.exists("grass-tile"))
             this.add.tileSprite(0, groundY, width, 12, "grass-tile")
               .setOrigin(0, 0).setDepth(1000);
           addTileLayers(
             groundY + grassH, dirtH,
-            ["grass-dirt-fill","grass-dirt-fill-r90","grass-dirt-fill-r180","grass-dirt-fill-r270"]
+            ["grass-dirt-fill","grass-dirt-fill-r90","grass-dirt-fill-r180","grass-dirt-fill-r270"],
+            D_DIRT
           );
           addTileLayers(
             groundY + grassH + dirtH, stoneH,
-            ["stone-dirt-fill","stone-dirt-fill-r90","stone-dirt-fill-r180","stone-dirt-fill-r270"]
+            ["stone-dirt-fill","stone-dirt-fill-r90","stone-dirt-fill-r180","stone-dirt-fill-r270"],
+            D_GROUND
           );
 
           // ── Resolve props: dynamic generation for room 0, static for others ────
@@ -671,6 +676,10 @@ export function PlatformerGame() {
           const SIGN_NAMES: Record<string, string> = {
             landing: "About Me", projects: "Projects", about: "Now", reading: "Reading",
           };
+          // Per-modalId override: force a specific sign sprite instead of cycling
+          const SIGN_KEY_OVERRIDE: Record<string, string> = {
+            "about": "sign-now",
+          };
           // Only include keys that are actually loaded
           const availableSignKeys = SIGN_KEYS.filter(k => this.textures.exists(k));
           // Transparent bottom padding per sign (px at scale 1); used to sink image so it sits flush
@@ -679,31 +688,23 @@ export function PlatformerGame() {
             "sign-bamboo":  29,
             "sign-lantern": 25,
             "sign-mossy":   21,
+            "sign-now":     32,
           };
-          // Per-sign label Y offset relative to groundY, and optional color override
+          // Per-sign label Y offset relative to groundY
           const SIGN_LABEL_Y: Record<string, number> = {
             "landing":  groundY - 70,  // "About Me" — lower on the board
             "projects": groundY - 70,  // "Projects" — lower on the board
-            "about":    groundY - 83,  // "Now" — compensate for 5px sink
-            "reading":  groundY - 100, // "Reading" — pull upward
+            "about":    groundY - 92,  // "Now" — raised to match sign shift
+            "reading":  groundY - 100, // "Reading" — pull upward (taller sprite)
           };
-          const SIGN_LABEL_COLOR: Record<string, string> = {
-            "landing":  "#111111",
-            "projects": "#111111",
-            "about":    "#d4c8a0",
-            "reading":  "#d4c8a0",
-          };
-          const SIGN_LABEL_STROKE: Record<string, string> = {
-            "landing":  "#ffffff",
-            "projects": "#ffffff",
-            "about":    "#000000",
-            "reading":  "#000000",
-          };
+          // Unified color scheme: warm cream text, dark green 2px border
+          const SIGN_LABEL_COLOR  = "#f5eecc";
+          const SIGN_LABEL_STROKE = "#1a3d0f";
           // Per-sign hover hint Y ([ ENTER ] prompt)
           const SIGN_HINT_Y: Record<string, number> = {
             "landing":  groundY - 52,
             "projects": groundY - 52,
-            "about":    groundY - 62,
+            "about":    groundY - 72,
             "reading":  groundY - 76,
           };
           this.signDefs  = [];
@@ -712,27 +713,28 @@ export function PlatformerGame() {
             const sd = theme.signs[si];
             const sx = Math.round(sd.xFrac * width);
             this.signDefs.push({ x: sx, modalId: sd.modalId });
-            // Cycle through all available sign keys
-            const usedKey = availableSignKeys.length > 0
-              ? availableSignKeys[si % availableSignKeys.length]
-              : null;
+            // Use per-modalId override if present, otherwise cycle through available keys
+            const overrideKey = SIGN_KEY_OVERRIDE[sd.modalId];
+            const usedKey = overrideKey && this.textures.exists(overrideKey)
+              ? overrideKey
+              : availableSignKeys.length > 0
+                ? availableSignKeys[si % availableSignKeys.length]
+                : null;
             const sink    = usedKey ? (SIGN_SINK[usedKey] ?? 6) : 0;
             const boardY  = groundY - 52;
             if (usedKey) {
               this.add.image(sx, groundY + sink, usedKey)
                 .setOrigin(0.5, 1).setScale(2).setDepth(D_SIGN);
               // Label on board
-              const label = SIGN_NAMES[sd.modalId] ?? "ENT";
-              const labelY      = SIGN_LABEL_Y[sd.modalId]     ?? groundY - 88;
-              const labelColor  = SIGN_LABEL_COLOR[sd.modalId] ?? "#d4c8a0";
-              const labelStroke = SIGN_LABEL_STROKE[sd.modalId] ?? "#ffffff";
+              const label  = SIGN_NAMES[sd.modalId] ?? "ENT";
+              const labelY = SIGN_LABEL_Y[sd.modalId] ?? groundY - 88;
               this.add.text(sx, labelY, label, {
                 fontFamily: "Arial, Helvetica, sans-serif",
                 fontStyle: "bold",
                 fontSize: "13px",
-                color: labelColor,
-                stroke: labelStroke,
-                strokeThickness: 1,
+                color: SIGN_LABEL_COLOR,
+                stroke: SIGN_LABEL_STROKE,
+                strokeThickness: 2,
               }).setOrigin(0.5).setDepth(D_SIGN + 0.1);
             } else {
               this.add.rectangle(sx, groundY - 18, 5, 34, 0x4a2a0a).setDepth(D_SIGN);
@@ -781,6 +783,17 @@ export function PlatformerGame() {
                   .setOrigin(0.5, 0.5).setDepth(D_FGPROP + 0.1);
                 badgeImg.setInteractive({ useHandCursor: true });
                 badgeImg.on("pointerdown", () => window.open(soc.url, "_blank"));
+              }
+              // "click me!" hint below the GitHub badge
+              if (soc.label === "GitHub") {
+                this.add.text(sx, badgeY + 48, "click me!", {
+                  fontFamily: "Arial, Helvetica, sans-serif",
+                  fontStyle:  "bold",
+                  fontSize:   "14px",
+                  color:      "#f5eecc",
+                  stroke:     "#1a3d0f",
+                  strokeThickness: 2,
+                }).setOrigin(0.5, 0).setDepth(D_FGPROP + 0.2);
               }
             }
           }
