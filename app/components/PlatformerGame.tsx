@@ -122,6 +122,12 @@ function ModalContent({ id }: { id: string }) {
     <>
       <p style={{ ...s.p, color: "#9fe1cb" }}>2026 reads</p>
       <p style={s.p}>
+        <strong style={{ color: "#e8e6e1" }}>Atomic Habits</strong> — Clear
+        <br />
+        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Currently reading</span>
+        {" · "}Very good, easy read. Highly recommend.
+      </p>
+      <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Foundation</strong> — Asimov
         <br />
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Worth reading</span>

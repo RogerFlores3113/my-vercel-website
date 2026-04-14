@@ -15,6 +15,23 @@ export default function Reading() {
           BOOK LIST
           ============================================ */}
       <section className="mb-16 space-y-5">
+        {/* Atomic Habits */}
+        <div className="project-card">
+          <div className="flex justify-between items-start mb-1">
+            <div>
+              <h2 className="text-xl font-medium italic">Atomic Habits</h2>
+              <p className="text-[var(--foreground-faint)] text-sm">
+                James Clear
+              </p>
+            </div>
+            <span className="tech-tag">Currently reading</span>
+          </div>
+          <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mt-3">
+            Very good, easy read. Highly recommend for everyone who wants to be
+            the best version of themselves.
+          </p>
+        </div>
+
         {/* Foundation */}
         <div className="project-card">
           <div className="flex justify-between items-start mb-1">
