@@ -33,6 +33,11 @@ function ModalContent({ id }: { id: string }) {
         Currently looking for SWE / AI engineering roles.
       </p>
       <p style={s.p}>
+        Currently building{" "}
+        <a href="https://podium-beta.vercel.app/" target="_blank" style={{ color: "#5dcaa5" }}>Podium</a>
+        {" "}— a live RAG assistant.
+      </p>
+      <p style={s.p}>
         <a href="mailto:rflores3113@gmail.com" style={{ color: "#5dcaa5" }}>
           rflores3113@gmail.com
         </a>
@@ -70,12 +75,20 @@ function ModalContent({ id }: { id: string }) {
       </p>
       <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, marginTop: 16 }}>Personal</p>
       <p style={s.p}>
+        <strong style={{ color: "#e8e6e1" }}>Podium</strong>{" "}
+        <a href="https://podium-beta.vercel.app/" target="_blank" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live beta</a>
+        <br />
+        RAG assistant with BYOK architecture, agentic tools, Terraform IaC on AWS.
+        <br />
+        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Next.js · TypeScript · AWS · Terraform · RAG</span>
+      </p>
+      <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Law Firm Lead Scraper</strong> — 3-day build.
         URL in → structured Excel out. Python + Selenium.
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Minecraft Escape Room</strong> — ~4hrs of gameplay,
-        second room in progress. Same systems-thinking muscles as real engineering.
+        second room in progress.
       </p>
     </>
   );
@@ -92,7 +105,7 @@ function ModalContent({ id }: { id: string }) {
       <p style={s.p}>
         Building{" "}
         <a href="https://podium-beta.vercel.app/" target="_blank" style={{ color: "#5dcaa5" }}>Podium</a>
-        , an LLM assistant. Beta is live.
+        {" "}— RAG assistant, BYOK architecture, agentic tools, Terraform IaC on AWS.
         <br />
         Training toward my private pilot&apos;s license.
         <br />

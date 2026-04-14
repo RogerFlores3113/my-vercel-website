@@ -92,14 +92,7 @@ export default function About() {
           <li>Hiking</li>
           <li>Tea</li>
           <li>Video games</li>
-          <li className="flex items-center gap-2">
-            Red pandas
-            <img
-              src="/red-panda.gif"
-              alt="red panda"
-              className="inline-block h-6 w-auto rounded"
-            />
-          </li>
+          <li>Red pandas</li>
         </ul>
         <p className="text-[15px] leading-relaxed text-[var(--foreground-muted)]">
           Still searching for the perfect morning green tea. If you have leads, i&apos;ll take them.
