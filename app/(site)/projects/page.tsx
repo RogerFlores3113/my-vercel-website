@@ -95,6 +95,45 @@ export default function Projects() {
         <p className="eyebrow">Personal projects</p>
 
         <div className="space-y-5">
+          {/* Podium — featured */}
+          <div className="project-card featured-card">
+            <p className="label-personal mb-2">RAG LLM assistant · Live beta</p>
+            <h2 className="text-xl font-medium mb-3">
+              Podium{" "}
+              <a
+                href="https://podium-beta.vercel.app/"
+                target="_blank"
+                className="text-sm text-[var(--accent)] hover:underline font-normal"
+              >
+                podium-beta.vercel.app ↗
+              </a>
+            </h2>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
+              A production RAG assistant with bring-your-own-key architecture — users supply
+              their own API keys and the system never stores credentials. Supports multiple
+              LLM backends with agentic tool compatibility for retrieval and web search.
+            </p>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
+              Infrastructure managed via Terraform IaC on AWS. Frontend deployed on Vercel.
+              My current main build.
+            </p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="tech-tag">Next.js</span>
+              <span className="tech-tag">TypeScript</span>
+              <span className="tech-tag">AWS</span>
+              <span className="tech-tag">Terraform</span>
+              <span className="tech-tag">RAG</span>
+              <span className="tech-tag">LLM</span>
+            </div>
+            <a
+              href="https://podium-beta.vercel.app/"
+              target="_blank"
+              className="text-[13px] text-[var(--accent)] hover:underline"
+            >
+              Try the live beta →
+            </a>
+          </div>
+
           {/* Law Firm Scraper */}
           <div className="project-card">
             <p className="label-personal mb-2">Automation · 3-day build</p>
@@ -138,10 +177,6 @@ export default function Projects() {
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
               The first escape room is complete: roughly 4 hours of gameplay.
               A second, significantly larger room is currently in progress.
-            </p>
-            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
-              Not traditional coding, but the systems thinking, project
-              coordination, and debugging logic are the same muscles.
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="tech-tag">Game Design</span>
