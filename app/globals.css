@@ -217,6 +217,50 @@ a {
 }
 
 /* ============================================
+   FEATURED PROJECT CARD
+   ============================================ */
+
+/* Featured card — used for Podium (personal projects lead) */
+.project-card.featured-card {
+  border-color: var(--accent-light);
+  background: linear-gradient(135deg, var(--background-card) 0%, var(--accent-light) 100%);
+  box-shadow: 0 2px 12px rgba(15, 110, 86, 0.08);
+}
+
+.project-card.featured-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 110, 86, 0.12);
+  border-color: var(--accent-mid);
+}
+
+/* Boring landing hero section */
+.boring-hero {
+  position: relative;
+  border-radius: 20px;
+  background: linear-gradient(160deg, var(--accent-light) 0%, var(--background) 60%);
+  padding: 48px 40px;
+  margin-bottom: 32px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .project-card.featured-card {
+    border-color: var(--accent-mid);
+    background: linear-gradient(135deg, var(--background-card) 0%, var(--accent-light) 100%);
+    /* --accent-light in dark = #0F3D30 — deep forest green, not washed out */
+    box-shadow: 0 2px 16px rgba(93, 202, 165, 0.08);
+  }
+
+  .project-card.featured-card:hover {
+    box-shadow: 0 8px 24px rgba(93, 202, 165, 0.12);
+    border-color: var(--accent-dark);
+  }
+
+  .boring-hero {
+    background: linear-gradient(160deg, var(--accent-light) 0%, var(--background) 60%);
+    /* --accent-light in dark = #0F3D30 — hero becomes a deep forest wash */
+  }
+}
+
+/* ============================================
    GAME LOADER
    ============================================ */
 
