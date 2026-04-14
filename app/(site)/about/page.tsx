@@ -8,12 +8,6 @@ export default function About() {
           ============================================ */}
       <section className="pt-16 pb-10">
         <h1 className="text-4xl font-medium tracking-tight mb-2">About me</h1>
-        <a
-          href="mailto:rflores3113@gmail.com"
-          className="text-[var(--accent)] hover:underline text-[15px]"
-        >
-          rflores3113@gmail.com
-        </a>
       </section>
 
       {/* Photo  wider aspect ratio, full-width */}
@@ -86,18 +80,29 @@ export default function About() {
           ============================================ */}
       <section className="mb-14">
         <p className="eyebrow">Interests</p>
+        <ul className="text-[15px] leading-relaxed text-[var(--foreground-muted)] space-y-1 mb-4 list-disc list-inside">
+          <li>
+            <a href="/reading" className="text-[var(--accent)] hover:underline">
+              Reading
+            </a>
+          </li>
+          <li>Board games</li>
+          <li>Piloting planes</li>
+          <li>Rock climbing</li>
+          <li>Hiking</li>
+          <li>Tea</li>
+          <li>Video games</li>
+          <li className="flex items-center gap-2">
+            Red pandas
+            <img
+              src="/red-panda.gif"
+              alt="red panda"
+              className="inline-block h-6 w-auto rounded"
+            />
+          </li>
+        </ul>
         <p className="text-[15px] leading-relaxed text-[var(--foreground-muted)]">
-          I read a lot.{" "}
-          <a
-            href="/reading"
-            className="text-[var(--accent)] hover:underline"
-          >
-            here&apos;s what I&apos;ve been reading
-          </a>
-          . I play board games (Terraforming Mars and Blood on the Clocktower
-          are current favorites). Rock climbing is my main physical activity,
-          but I also love hiking and flying. And I&apos;m still searching for
-          the perfect morning green tea. If you have any leads i'll take them!
+          Still searching for the perfect morning green tea. If you have leads, i&apos;ll take them.
         </p>
       </section>
 
