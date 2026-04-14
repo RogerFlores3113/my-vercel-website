@@ -60,7 +60,8 @@ export default function About() {
             >
               Podium
             </a>
-            , an LLM assistant. The beta is live. Try it out!
+            {" "}— a RAG assistant with bring-your-own-key architecture, agentic tool compatibility,
+            and Terraform-managed AWS infrastructure.
           </p>
           <p>
             Training toward my private pilot&apos;s license.
@@ -86,7 +87,7 @@ export default function About() {
       <section className="mb-14">
         <p className="eyebrow">Interests</p>
         <p className="text-[15px] leading-relaxed text-[var(--foreground-muted)]">
-          I read a lot :D {" "}
+          I read a lot.{" "}
           <a
             href="/reading"
             className="text-[var(--accent)] hover:underline"
@@ -96,7 +97,7 @@ export default function About() {
           . I play board games (Terraforming Mars and Blood on the Clocktower
           are current favorites). Rock climbing is my main physical activity,
           but I also love hiking and flying. And I&apos;m still searching for
-          the perfect morning green tea. If you have any leads i'll take thdm!
+          the perfect morning green tea. If you have any leads i'll take them!
         </p>
       </section>
 
