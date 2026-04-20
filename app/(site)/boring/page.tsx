@@ -1,5 +1,6 @@
 import { CTABanner } from "../../layout";
 import Link from "next/link";
+import { GameVersionLink } from "./GameVersionLink";
 
 export default function Boring() {
   return (
@@ -18,7 +19,7 @@ export default function Boring() {
           <Link href="/projects" className="pill-link">Projects</Link>
           <Link href="/about"    className="pill-link">About</Link>
           <Link href="/reading"  className="pill-link">Reading</Link>
-          <a href="/"            className="pill-link">← game version</a>
+          <GameVersionLink />
         </div>
       </section>
 

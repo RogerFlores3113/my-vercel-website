@@ -1,9 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { GameLoader } from "./components/GameLoader";
+import { WelcomeSplash } from "./components/WelcomeSplash";
 
-// Load PlatformerGame client-side only — Phaser touches window/canvas at import time
 const PlatformerGame = dynamic(
   () =>
     import("./components/PlatformerGame").then((m) => ({
@@ -16,17 +17,18 @@ const PlatformerGame = dynamic(
 );
 
 export default function Home() {
-  return (
-    <>
-      {/* Skip link — always visible on Tab focus, for keyboard/screen reader users */}
-      <a
-        href="/boring"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:text-sm focus:rounded"
-      >
-        skip to standard site →
-      </a>
+  const [phase, setPhase] = useState<"splash" | "game">("splash");
 
-      <PlatformerGame />
-    </>
-  );
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("rflor-site-mode");
+      if (stored === "game") setPhase("game");
+      else if (stored === "boring") window.location.replace("/boring");
+    } catch {}
+  }, []);
+
+  if (phase === "splash") {
+    return <WelcomeSplash onEnter={() => setPhase("game")} />;
+  }
+  return <PlatformerGame />;
 }

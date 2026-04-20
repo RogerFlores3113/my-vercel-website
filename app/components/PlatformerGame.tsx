@@ -155,6 +155,71 @@ function ModalContent({ id }: { id: string }) {
   return null;
 }
 
+// ─── ESC menu overlay ──────────────────────────────────────────────────────────
+function EscMenu({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      style={{
+        position: "fixed", inset: 0, zIndex: 200,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        background: "rgba(0,0,0,0.75)",
+      }}
+    >
+      <div
+        style={{
+          background: "#1a2e1a",
+          border: "2px solid #4a7c3f",
+          borderRadius: 10,
+          padding: "28px 36px",
+          fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif",
+          color: "#a8a69e",
+          minWidth: 260,
+          textAlign: "center",
+          position: "relative",
+        }}
+      >
+        <button
+          onClick={onClose}
+          aria-label="Close menu"
+          style={{
+            position: "absolute", top: 10, right: 14,
+            background: "none", border: "none", color: "#4a7c3f",
+            fontSize: 18, cursor: "pointer", lineHeight: 1,
+          }}
+        >
+          ✕
+        </button>
+        <p style={{ color: "#9fe1cb", fontWeight: 600, marginBottom: 20, fontSize: 16 }}>Paused</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: "#2d4a1e", border: "2px solid #4a7c3f", borderRadius: 6,
+              color: "#9fe1cb", fontFamily: "inherit", fontSize: 15, padding: "10px 20px",
+              cursor: "pointer",
+            }}
+          >
+            Continue playing
+          </button>
+          <button
+            onClick={() => {
+              try { localStorage.setItem("rflor-site-mode", "boring"); } catch {}
+              window.location.href = "/boring";
+            }}
+            style={{
+              background: "none", border: "1px solid #4a7c3f", borderRadius: 6,
+              color: "#4a7c3f", fontFamily: "inherit", fontSize: 15, padding: "10px 20px",
+              cursor: "pointer",
+            }}
+          >
+            Exit to portfolio site
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Modal overlay ─────────────────────────────────────────────────────────────
 function Modal({ modalId, onClose }: { modalId: string; onClose: () => void }) {
   const titles: Record<string, string> = {
@@ -203,16 +268,17 @@ function Modal({ modalId, onClose }: { modalId: string; onClose: () => void }) {
 export function PlatformerGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef      = useRef<unknown>(null);
-  const [loading,   setLoading]   = useState(true);
-  const [loadError, setLoadError] = useState(false);
-  const [modal,     setModal]     = useState<string | null>(null);
+  const [loading,    setLoading]    = useState(true);
+  const [loadError,  setLoadError]  = useState(false);
+  const [modal,      setModal]      = useState<string | null>(null);
+  const [showEscMenu, setShowEscMenu] = useState(false);
 
-  // ESC: Phaser fires "game-esc"; close modal if open, else go to /boring
+  // ESC: Phaser fires "game-esc"; close modal if open, else show ESC menu
   useEffect(() => {
     const onEsc = () => {
       setModal(prev => {
         if (prev !== null) return null;
-        window.location.href = "/boring";
+        setShowEscMenu(true);
         return null;
       });
     };
@@ -1137,6 +1203,7 @@ export function PlatformerGame() {
       {loading && !loadError && <GameLoader />}
       {loadError && <GameLoader error />}
       {modal && <Modal modalId={modal} onClose={() => setModal(null)} />}
+      {showEscMenu && <EscMenu onClose={() => setShowEscMenu(false)} />}
       <div
         ref={containerRef}
         style={{

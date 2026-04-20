@@ -5,7 +5,14 @@ export function GameLoader({ error }: { error?: boolean }) {
     return (
       <div className="game-loader game-loader--error">
         <p>game failed to load.</p>
-        <a href="/boring">view standard site →</a>
+        <a
+          href="/boring"
+          onClick={() => {
+            try { localStorage.setItem("rflor-site-mode", "boring"); } catch {}
+          }}
+        >
+          view standard site →
+        </a>
       </div>
     );
   }
