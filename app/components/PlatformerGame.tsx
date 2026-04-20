@@ -698,7 +698,7 @@ export function PlatformerGame() {
 
           // Instructions — room 0 only, top-center
           if (this.roomIndex === 0) {
-            this.add.text(width / 2, 18, "WASD / Arrow Keys to move   ·   ESC for portfolio", {
+            this.add.text(width / 2, 18, "WASD / Arrow Keys  ·  SHIFT to sprint  ·  ESC for menu", {
               fontFamily: "Arial, Helvetica, sans-serif",
               fontStyle: "bold",
               fontSize: "16px",
