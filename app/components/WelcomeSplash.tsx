@@ -25,10 +25,10 @@ export function WelcomeSplash({ onEnter }: { onEnter: () => void }) {
     <dialog ref={dialogRef} className="welcome-splash">
       <div className="splash-modal">
         <Image
-          src="/props/red-panda-favicon.png"
-          alt="Red panda pixel art"
-          width={128}
-          height={128}
+          src="/headshot_pic.jpg"
+          alt="Roger Flores"
+          width={100}
+          height={100}
           className="splash-portrait"
           priority
         />

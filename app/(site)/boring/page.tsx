@@ -1,5 +1,6 @@
 import { CTABanner } from "../../layout";
 import Link from "next/link";
+import Image from "next/image";
 import { GameVersionLink } from "./GameVersionLink";
 
 export default function Boring() {
@@ -8,18 +9,29 @@ export default function Boring() {
 
       {/* Hero */}
       <section className="boring-hero mt-10">
-        <p className="eyebrow mb-3">Software Engineer</p>
-        <h1 className="text-4xl font-medium tracking-tight mb-4">Roger Flores</h1>
-        <p className="text-lg text-[var(--foreground-muted)] leading-relaxed mb-6">
-          Full-stack and AI engineering. I&apos;ve shipped production systems for
-          Fortune 500 companies and county governments — and I&apos;m building
-          one of my own right now.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/projects" className="pill-link">Projects</Link>
-          <Link href="/about"    className="pill-link">About</Link>
-          <Link href="/reading"  className="pill-link">Reading</Link>
-          <GameVersionLink />
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex-1">
+            <p className="eyebrow mb-3">Software Engineer</p>
+            <h1 className="text-4xl font-medium tracking-tight mb-4">Roger Flores</h1>
+            <p className="text-lg text-[var(--foreground-muted)] leading-relaxed mb-6">
+              Full-stack and AI engineering. I&apos;ve shipped production systems for
+              Fortune 500 companies and county governments — and I&apos;m building
+              one of my own right now.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/projects" className="pill-link">Projects</Link>
+              <Link href="/about"    className="pill-link">About</Link>
+              <Link href="/reading"  className="pill-link">Reading</Link>
+              <GameVersionLink />
+            </div>
+          </div>
+          <Image
+            src="/headshot_pic.jpg"
+            alt="Roger Flores"
+            width={96}
+            height={96}
+            className="rounded-full object-cover object-top shrink-0 hidden sm:block"
+          />
         </div>
       </section>
 

@@ -13,9 +13,9 @@ export default function About() {
       {/* Photo  wider aspect ratio, full-width */}
       <div className="mb-10 rounded-2xl overflow-hidden">
         <img
-          src="/Roger_Website.jpg"
+          src="/full_profile.jpg"
           alt="Roger Flores"
-          className="w-full aspect-[16/10] object-cover"
+          className="w-full aspect-[4/5] object-cover object-center"
         />
       </div>
 

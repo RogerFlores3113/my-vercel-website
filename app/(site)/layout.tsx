@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PandaWalker } from "@/app/components/PandaWalker";
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -51,9 +52,16 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link
             href="/"
-            className="font-medium text-[var(--foreground)] text-[15px] hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            Roger Flores
+            <Image
+              src="/headshot_pic.jpg"
+              alt="Roger Flores"
+              width={28}
+              height={28}
+              className="rounded-full object-cover object-top"
+            />
+            <span className="font-medium text-[var(--foreground)] text-[15px]">Roger Flores</span>
           </Link>
           <div className="flex items-center gap-6">
             <NavLink href="/projects">Projects</NavLink>
