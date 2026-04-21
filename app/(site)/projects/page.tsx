@@ -16,7 +16,7 @@ export default function Projects() {
           PROFESSIONAL EXPERIENCE
           ============================================ */}
       <section className="mb-16">
-        <p className="eyebrow">Professional experience</p>
+        <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">Professional experience</h2>
 
         <div className="space-y-5">
           {/* Property Appraisal */}
@@ -92,7 +92,7 @@ export default function Projects() {
           PERSONAL PROJECTS
           ============================================ */}
       <section className="mb-16">
-        <p className="eyebrow">Personal projects</p>
+        <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">Personal projects</h2>
 
         <div className="space-y-5">
           {/* Podium — featured */}

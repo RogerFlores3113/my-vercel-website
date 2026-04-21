@@ -199,8 +199,20 @@ function EscMenu({ onClose }: { onClose: () => void }) {
               cursor: "pointer",
             }}
           >
-            Continue playing
+            Resume
           </button>
+          <a
+            href="/rflores_resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: "none", border: "1px solid #4a7c3f", borderRadius: 6,
+              color: "#9fe1cb", fontFamily: "inherit", fontSize: 15, padding: "10px 20px",
+              cursor: "pointer", textDecoration: "none", textAlign: "center",
+            }}
+          >
+            Resume ↗
+          </a>
           <button
             onClick={() => {
               try { localStorage.setItem("rflor-site-mode", "boring"); } catch {}
@@ -212,7 +224,7 @@ function EscMenu({ onClose }: { onClose: () => void }) {
               cursor: "pointer",
             }}
           >
-            Exit to portfolio site
+            Traditional website →
           </button>
         </div>
       </div>
@@ -257,7 +269,7 @@ function Modal({ modalId, onClose }: { modalId: string; onClose: () => void }) {
         <ModalContent id={modalId} />
         <div style={{ marginTop: 22, borderTop: "1px solid #2d4a1e", paddingTop: 14, fontSize: "clamp(12px, 1vw, 14px)", color: "#4a7c3f", display: "flex", gap: 16 }}>
           <span>[ESC] close</span>
-          <a href="/boring" style={{ color: "#4a7c3f" }}>full site →</a>
+          <a href="/boring" style={{ color: "#4a7c3f" }}>Traditional website →</a>
         </div>
       </div>
     </div>
@@ -698,7 +710,7 @@ export function PlatformerGame() {
 
           // Instructions — room 0 only, top-center
           if (this.roomIndex === 0) {
-            this.add.text(width / 2, 18, "WASD / Arrow Keys  ·  SHIFT to sprint  ·  ESC for menu", {
+            this.add.text(width / 2, 18, "WASD / Arrow Keys  ·  SHIFT to sprint  ·  ESC to pause", {
               fontFamily: "Arial, Helvetica, sans-serif",
               fontStyle: "bold",
               fontSize: "16px",

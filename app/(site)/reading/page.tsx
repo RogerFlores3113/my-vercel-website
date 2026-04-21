@@ -98,7 +98,7 @@ export default function Reading() {
           WANT TO READ
           ============================================ */}
       <section className="mb-16">
-        <p className="eyebrow">Want to read</p>
+        <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">Want to read</h2>
         <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed">
           {/* Add your upcoming books here. Even 2-3 titles makes the page
               feel like a living document instead of a finished list. Example: */}

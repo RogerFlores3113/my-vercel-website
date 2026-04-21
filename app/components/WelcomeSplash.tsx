@@ -33,7 +33,7 @@ export function WelcomeSplash({ onEnter }: { onEnter: () => void }) {
           priority
         />
         <h1 className="splash-heading">Hi, I&apos;m Roger.</h1>
-        <p className="splash-sub">welcome to my website.</p>
+        <p className="splash-sub">welcome to my portfolio website.</p>
         <div className="splash-actions">
           <button onClick={handleEnter} className="splash-btn-primary">
             Enter
@@ -43,7 +43,7 @@ export function WelcomeSplash({ onEnter }: { onEnter: () => void }) {
             onClick={handleBoring}
             className="splash-btn-secondary"
           >
-            Boring mode →
+            Traditional website →
           </Link>
         </div>
       </div>

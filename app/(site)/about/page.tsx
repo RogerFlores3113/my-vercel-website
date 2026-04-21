@@ -25,17 +25,17 @@ export default function About() {
       <section className="mb-14">
         <div className="space-y-4 text-[17px] leading-relaxed text-[var(--foreground-muted)]">
           <p>
-            I&apos;m a software engineer who&apos;s happiest when a problem
-            requires both technical depth and talking to real people. My
-            professional work has ranged from ML-powered inventory optimization
-            for Fortune 500 companies to deploying property appraisal systems
-            for county governments.
+            Hey, I&apos;m Roger! I&apos;m a software engineer who&apos;s happiest
+            when a problem requires both technical depth and talking to real people.
+            My work has taken me from ML-powered inventory optimization for Fortune
+            500 companies to deploying property appraisal systems for county
+            governments, and I genuinely love the variety.
           </p>
           <p>
-            I&apos;m drawn to the kind of work where you have to figure out
-            what the actual problem is before you can solve it. Client-facing
-            requirements gathering, ambiguous data, systems that need to work
-            in the real world; these are where I do my best work.
+            I&apos;m drawn to the kind of work where you have to figure out what
+            the actual problem is before you can solve it. Client-facing requirements
+            gathering, ambiguous data, systems that have to work in the messy real
+            world -- that&apos;s where I do my best work.
           </p>
         </div>
       </section>
@@ -54,11 +54,12 @@ export default function About() {
             >
               Podium
             </a>
-            {" "}— a RAG assistant with bring-your-own-key architecture, agentic tool compatibility,
-            and Terraform-managed AWS infrastructure.
+            , a RAG assistant with bring-your-own-key architecture, agentic tool
+            compatibility, and Terraform-managed AWS infrastructure.
           </p>
           <p>
-            Training toward my private pilot&apos;s license.
+            Training toward my private pilot&apos;s license. The progress is slow
+            but I love every minute of it.
           </p>
           <p>
             Exploring Andrej Karpathy&apos;s{" "}
@@ -68,9 +69,9 @@ export default function About() {
               className="text-[var(--accent)] hover:underline"
             >
               nanochat
-            </a>{" "}
-            — specifically, how to get meaningful results from a model designed
-            for 40 hours on 8×H100 GPUs when all I have is a 4080 Super.
+            </a>
+            . Specifically, how to squeeze meaningful results out of a model
+            designed for 40 hours on 8×H100 GPUs when all I have is a 4080 Super.
           </p>
         </div>
       </section>
