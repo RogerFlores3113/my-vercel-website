@@ -101,11 +101,11 @@ export default function Projects() {
             <h2 className="text-xl font-medium mb-3">
               Podium{" "}
               <a
-                href="https://podium-beta.vercel.app/"
-                target="_blank"
+                href="https://podium.rogerflores.dev/"
+                target="_blank" rel="noopener noreferrer"
                 className="text-sm text-[var(--accent)] hover:underline font-normal"
               >
-                podium-beta.vercel.app ↗
+                podium.rogerflores.dev ↗
               </a>
             </h2>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
@@ -126,8 +126,8 @@ export default function Projects() {
               <span className="tech-tag">LLM</span>
             </div>
             <a
-              href="https://podium-beta.vercel.app/"
-              target="_blank"
+              href="https://podium.rogerflores.dev/"
+              target="_blank" rel="noopener noreferrer"
               className="text-[13px] text-[var(--accent)] hover:underline"
             >
               Try the live beta →

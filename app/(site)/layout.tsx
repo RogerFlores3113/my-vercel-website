@@ -21,14 +21,14 @@ function Footer() {
         <div className="flex gap-6">
           <a
             href="https://github.com/RogerFlores3113"
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             className="hover:text-[var(--foreground-muted)] transition-colors"
           >
             GitHub
           </a>
           <a
             href="https://www.linkedin.com/in/roger-flores-3113-nu/"
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             className="hover:text-[var(--foreground-muted)] transition-colors"
           >
             LinkedIn

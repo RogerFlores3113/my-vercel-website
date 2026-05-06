@@ -1,4 +1,5 @@
 import { CTABanner } from "../../layout";
+import Image from "next/image";
 
 export default function About() {
   return (
@@ -11,11 +12,12 @@ export default function About() {
       </section>
 
       {/* Photo  wider aspect ratio, full-width */}
-      <div className="mb-10 rounded-2xl overflow-hidden">
-        <img
+      <div className="mb-10 rounded-2xl overflow-hidden relative aspect-[4/5]">
+        <Image
           src="/full_profile.jpg"
           alt="Roger Flores"
-          className="w-full aspect-[4/5] object-cover object-center"
+          fill
+          className="object-cover object-center"
         />
       </div>
 
@@ -49,7 +51,7 @@ export default function About() {
           <p>
             Building{" "}
             <a
-              href="https://podium-beta.vercel.app/"
+              href="https://podium.rogerflores.dev/"
               className="text-[var(--accent)] hover:underline"
             >
               Podium
@@ -65,7 +67,7 @@ export default function About() {
             Exploring Andrej Karpathy&apos;s{" "}
             <a
               href="https://github.com/karpathy/nanochat"
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               className="text-[var(--accent)] hover:underline"
             >
               nanochat
