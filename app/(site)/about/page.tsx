@@ -49,7 +49,7 @@ export default function About() {
           <p>
             Building{" "}
             <a
-              href="https://podium-beta.vercel.app/"
+              href="https://podium.rogerflores.dev/"
               className="text-[var(--accent)] hover:underline"
             >
               Podium
@@ -65,7 +65,7 @@ export default function About() {
             Exploring Andrej Karpathy&apos;s{" "}
             <a
               href="https://github.com/karpathy/nanochat"
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               className="text-[var(--accent)] hover:underline"
             >
               nanochat
