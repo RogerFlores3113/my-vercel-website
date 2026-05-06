@@ -99,9 +99,11 @@ export default function Reading() {
           ============================================ */}
       <section className="mb-16">
         <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">Want to read</h2>
+        <ul className="text-[15px] text-[var(--foreground-muted)] leading-relaxed space-y-1 mb-4 list-disc list-inside">
+          <li><em>Notes on Being a Man</em> — Scott Galloway</li>
+          <li><em>Empire of AI</em> — Karen Hao</li>
+        </ul>
         <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed">
-          {/* Add your upcoming books here. Even 2-3 titles makes the page
-              feel like a living document instead of a finished list. Example: */}
           Updating this as I go. Recommendations welcome —{" "}
           <a
             href="mailto:rflores3113@gmail.com"
