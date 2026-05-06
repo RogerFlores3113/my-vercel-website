@@ -134,6 +134,64 @@ export default function Projects() {
             </a>
           </div>
 
+          {/* URL Shortener */}
+          <div className="project-card">
+            <p className="label-personal mb-2">System design · Live tool</p>
+            <h2 className="text-xl font-medium mb-3">
+              URL Shortener{" "}
+              <a
+                href="https://short.rogerflores.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[var(--accent)] hover:underline font-normal"
+              >
+                short.rogerflores.dev ↗
+              </a>
+            </h2>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
+              Built to understand how URL shortening actually works at the system
+              level — rate limiting, collision handling, redirect latency. Ended
+              up being genuinely useful, so it lives at its own domain.
+            </p>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
+              An AI agent handles the link-shortening workflow. Gave me a good
+              excuse to think through agentic tool design in a low-stakes context.
+            </p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="tech-tag">Next.js</span>
+              <span className="tech-tag">TypeScript</span>
+              <span className="tech-tag">System Design</span>
+            </div>
+          </div>
+
+          {/* Longdle */}
+          <div className="project-card">
+            <p className="label-personal mb-2">Word game · Live</p>
+            <h2 className="text-xl font-medium mb-3">
+              Longdle{" "}
+              <a
+                href="https://longdle.rogerflores.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[var(--accent)] hover:underline font-normal"
+              >
+                longdle.rogerflores.dev ↗
+              </a>
+            </h2>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
+              Wordle, but the word is six letters. Daily puzzle updates,
+              localStorage score tracking, and a share button — because
+              apparently I needed to be able to brag about my guesses.
+            </p>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
+              Mostly built because I found five-letter Wordle too easy. Mostly.
+            </p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="tech-tag">Next.js</span>
+              <span className="tech-tag">TypeScript</span>
+            </div>
+          </div>
+
           {/* Law Firm Scraper */}
           <div className="project-card">
             <p className="label-personal mb-2">Automation · 3-day build</p>
