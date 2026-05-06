@@ -192,6 +192,27 @@ export default function Projects() {
             </div>
           </div>
 
+          {/* LLM Eval Harness — WIP */}
+          <div className="project-card opacity-60">
+            <p className="label-personal mb-2">Dev tooling · In progress</p>
+            <h2 className="text-xl font-medium mb-3">LLM Eval Harness</h2>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
+              A local evaluation harness for benchmarking LLM outputs across
+              different models and prompting strategies. Runs test suites,
+              scores responses, and logs results for comparison.
+            </p>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
+              Built because eyeballing model outputs is not a methodology.
+            </p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="tech-tag">Python</span>
+              <span className="tech-tag">LLM</span>
+            </div>
+            <p className="text-[13px] text-[var(--foreground-faint)]">
+              GitHub and writeup coming soon.
+            </p>
+          </div>
+
           {/* Law Firm Scraper */}
           <div className="project-card">
             <p className="label-personal mb-2">Automation · 3-day build</p>
