@@ -34,7 +34,7 @@ function ModalContent({ id }: { id: string }) {
       </p>
       <p style={s.p}>
         Currently building{" "}
-        <a href="https://podium-beta.vercel.app/" target="_blank" style={{ color: "#5dcaa5" }}>Podium</a>
+        <a href="https://podium.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Podium</a>
         {" "}— a live RAG assistant.
       </p>
       <p style={s.p}>
@@ -42,11 +42,11 @@ function ModalContent({ id }: { id: string }) {
           rflores3113@gmail.com
         </a>
         {" · "}
-        <a href="https://github.com/RogerFlores3113" target="_blank" style={{ color: "#5dcaa5" }}>
+        <a href="https://github.com/RogerFlores3113" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>
           GitHub
         </a>
         {" · "}
-        <a href="https://www.linkedin.com/in/roger-flores-3113-nu/" target="_blank" style={{ color: "#5dcaa5" }}>
+        <a href="https://www.linkedin.com/in/roger-flores-3113-nu/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>
           LinkedIn
         </a>
       </p>
@@ -76,7 +76,7 @@ function ModalContent({ id }: { id: string }) {
       <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, marginTop: 16 }}>Personal</p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Podium</strong>{" "}
-        <a href="https://podium-beta.vercel.app/" target="_blank" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live beta</a>
+        <a href="https://podium.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live beta</a>
         <br />
         RAG assistant with BYOK architecture, agentic tools, Terraform IaC on AWS.
         <br />
@@ -104,7 +104,7 @@ function ModalContent({ id }: { id: string }) {
       <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Now</p>
       <p style={s.p}>
         Building{" "}
-        <a href="https://podium-beta.vercel.app/" target="_blank" style={{ color: "#5dcaa5" }}>Podium</a>
+        <a href="https://podium.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Podium</a>
         {" "}— RAG assistant, BYOK architecture, agentic tools, Terraform IaC on AWS.
         <br />
         Training toward my private pilot&apos;s license.
@@ -203,8 +203,7 @@ function EscMenu({ onClose }: { onClose: () => void }) {
           </button>
           <a
             href="/rflores_resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
+            target="_blank" rel="noopener noreferrer"
             style={{
               background: "none", border: "1px solid #4a7c3f", borderRadius: 6,
               color: "#9fe1cb", fontFamily: "inherit", fontSize: 15, padding: "10px 20px",
