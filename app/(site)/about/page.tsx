@@ -17,6 +17,8 @@ export default function About() {
           src="/full_profile.jpg"
           alt="Roger Flores"
           fill
+          sizes="(max-width: 768px) 100vw, 672px"
+          loading="eager"
           className="object-cover object-center"
         />
       </div>

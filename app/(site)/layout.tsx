@@ -59,7 +59,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
               alt="Roger Flores"
               width={28}
               height={28}
-              className="rounded-full object-cover object-top"
+              className="rounded-full object-cover object-top w-7 h-7"
             />
             <span className="font-medium text-[var(--foreground)] text-[15px]">Roger Flores</span>
           </Link>
