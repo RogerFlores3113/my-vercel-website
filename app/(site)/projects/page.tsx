@@ -1,8 +1,18 @@
-import { CTABanner } from "../../layout";
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { CTABanner } from "../../components/CTABanner";
+import ComingSoonModal from "../../components/ComingSoonModal";
+import OfflinePlaceholder from "../../components/OfflinePlaceholder";
 
 export default function Projects() {
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+
   return (
     <main className="max-w-3xl mx-auto px-6">
+      <ComingSoonModal isOpen={searchModalOpen} onClose={() => setSearchModalOpen(false)} />
+
       {/* Header */}
       <section className="pt-16 pb-10">
         <h1 className="text-4xl font-medium tracking-tight mb-4">Projects</h1>
@@ -72,8 +82,7 @@ export default function Projects() {
             </p>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
               Maintained and extended the production system alongside five other
-              engineers, balancing ongoing bug resolution with new feature
-              development.
+              engineers, balancing ongoing bug resolution with new feature development.
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="tech-tag">React</span>
@@ -97,7 +106,16 @@ export default function Projects() {
         <div className="space-y-5">
           {/* Podium — featured */}
           <div className="project-card featured-card">
-            <p className="label-personal mb-2">RAG LLM assistant · Live beta</p>
+            <div className="project-screenshot">
+              <Image
+                src="/screenshots/podium.png"
+                alt="Podium app screenshot"
+                fill
+                style={{ objectFit: "cover", objectPosition: "top center" }}
+                sizes="(max-width: 768px) 100vw, 768px"
+              />
+            </div>
+            <p className="label-personal mb-2">RAG LLM assistant · Live</p>
             <h2 className="text-xl font-medium mb-3">
               Podium{" "}
               <a
@@ -109,19 +127,19 @@ export default function Projects() {
               </a>
             </h2>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
-              A production RAG assistant with bring-your-own-key architecture — users supply
-              their own API keys and the system never stores credentials. Supports multiple
-              LLM backends with agentic tool compatibility for retrieval and web search.
+              A production RAG assistant with agentic tools and modular plug-and-play LLM support — swap
+              backends without changing your workflow. Users bring their own API keys; credentials are
+              never stored. Clerk handles auth, with a free guest tier so anyone can try it.
             </p>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
-              Infrastructure managed via Terraform IaC on AWS. Frontend deployed on Vercel.
-              My current main build.
+              Infrastructure managed via Terraform on AWS. Frontend on Vercel. My current main build.
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="tech-tag">Next.js</span>
               <span className="tech-tag">TypeScript</span>
               <span className="tech-tag">AWS</span>
               <span className="tech-tag">Terraform</span>
+              <span className="tech-tag">Clerk</span>
               <span className="tech-tag">RAG</span>
               <span className="tech-tag">LLM</span>
             </div>
@@ -130,42 +148,90 @@ export default function Projects() {
               target="_blank" rel="noopener noreferrer"
               className="text-[13px] text-[var(--accent)] hover:underline"
             >
-              Try the live beta →
+              Try it out! Guests get limited free usage. →
             </a>
           </div>
 
-          {/* URL Shortener */}
+          {/* Search */}
+          <div
+            className="project-card cursor-pointer"
+            onClick={() => setSearchModalOpen(true)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSearchModalOpen(true); }}
+          >
+            <div className="offline-placeholder">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4 }}>
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <span>Screenshot coming soon</span>
+            </div>
+            <p className="label-personal mb-2">Agentic tool · In development</p>
+            <h2 className="text-xl font-medium mb-3">Search</h2>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
+              An LLM-powered agent that loops: screenshot → click → screenshot → click. Designed to
+              collect apartment listings, recruitment leads, job openings, or anything that fits a
+              mass search format. Modular enough to aim at new targets with minimal reconfiguration.
+            </p>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
+              Locally installed. Not a web app.
+            </p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="tech-tag">Python</span>
+              <span className="tech-tag">LLM</span>
+              <span className="tech-tag">Computer Use</span>
+            </div>
+            <p className="text-[13px] text-[var(--foreground-faint)]">
+              Available on request
+            </p>
+          </div>
+
+          {/* Experiments */}
           <div className="project-card">
-            <p className="label-personal mb-2">System design · Live tool</p>
+            <div className="project-screenshot">
+              <Image
+                src="/screenshots/experiments.png"
+                alt="Experiments site screenshot"
+                fill
+                style={{ objectFit: "cover", objectPosition: "top center" }}
+                sizes="(max-width: 768px) 100vw, 768px"
+              />
+            </div>
+            <p className="label-personal mb-2">LLM research · Live</p>
             <h2 className="text-xl font-medium mb-3">
-              URL Shortener{" "}
+              Experiments{" "}
               <a
-                href="https://short.rogerflores.dev"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="https://experiments.rogerflores.dev"
+                target="_blank" rel="noopener noreferrer"
                 className="text-sm text-[var(--accent)] hover:underline font-normal"
               >
-                short.rogerflores.dev ↗
+                experiments.rogerflores.dev ↗
               </a>
             </h2>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
-              Built to understand how URL shortening actually works at the system
-              level — rate limiting, collision handling, redirect latency. Ended
-              up being genuinely useful, so it lives at its own domain.
-            </p>
-            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
-              An AI agent handles the link-shortening workflow. Gave me a good
-              excuse to think through agentic tool design in a low-stakes context.
+              A site where I post writeups on my own experiments running and tuning local LLMs —
+              LoRA fine-tuning, weight probes, math benchmarks, and whatever else I&apos;m currently
+              obsessing over.
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
-              <span className="tech-tag">Next.js</span>
-              <span className="tech-tag">TypeScript</span>
-              <span className="tech-tag">System Design</span>
+              <span className="tech-tag">Python</span>
+              <span className="tech-tag">LLM</span>
+              <span className="tech-tag">LoRA</span>
             </div>
           </div>
 
           {/* Longdle */}
           <div className="project-card">
+            <div className="project-screenshot">
+              <Image
+                src="/screenshots/longdle.png"
+                alt="Longdle word game screenshot"
+                fill
+                style={{ objectFit: "cover", objectPosition: "top center" }}
+                sizes="(max-width: 768px) 100vw, 768px"
+              />
+            </div>
             <p className="label-personal mb-2">Word game · Live</p>
             <h2 className="text-xl font-medium mb-3">
               Longdle{" "}
@@ -179,12 +245,11 @@ export default function Projects() {
               </a>
             </h2>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
-              Wordle, but the word is six letters. Daily puzzle updates,
-              localStorage score tracking, and a share button — because
-              apparently I needed to be able to brag about my guesses.
+              Wordle, but the word is six letters. Daily puzzle updates, localStorage score tracking,
+              and infinite replayability via a randomizer mode for when the daily isn&apos;t enough.
             </p>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
-              Mostly built because I found five-letter Wordle too easy. Mostly.
+              Try if you dare.
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="tech-tag">Next.js</span>
@@ -192,43 +257,87 @@ export default function Projects() {
             </div>
           </div>
 
-          {/* LLM Eval Harness — WIP */}
-          <div className="project-card opacity-60">
-            <p className="label-personal mb-2">Dev tooling · In progress</p>
-            <h2 className="text-xl font-medium mb-3">LLM Eval Harness</h2>
+          {/* Short */}
+          <div className="project-card">
+            <div className="project-screenshot">
+              <Image
+                src="/screenshots/short.png"
+                alt="Short URL shortener screenshot"
+                fill
+                style={{ objectFit: "cover", objectPosition: "top center" }}
+                sizes="(max-width: 768px) 100vw, 768px"
+              />
+            </div>
+            <h2 className="text-xl font-medium mb-3">
+              Short{" "}
+              <a
+                href="https://short.rogerflores.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[var(--accent)] hover:underline font-normal"
+              >
+                short.rogerflores.dev ↗
+              </a>
+            </h2>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
-              A local evaluation harness for benchmarking LLM outputs across
-              different models and prompting strategies. Runs test suites,
-              scores responses, and logs results for comparison.
-            </p>
-            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
-              Built because eyeballing model outputs is not a methodology.
+              Simple, minimal, functional. A URL shortener I built as a deliberate test of my own
+              system design and fundamentals — rate limiting, collision handling, redirect latency.
+              Ended up being genuinely useful.
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
-              <span className="tech-tag">Python</span>
-              <span className="tech-tag">LLM</span>
+              <span className="tech-tag">Next.js</span>
+              <span className="tech-tag">TypeScript</span>
+              <span className="tech-tag">System Design</span>
             </div>
+          </div>
+
+          {/* Property */}
+          <div className="project-card">
+            <div className="project-screenshot">
+              <Image
+                src="/screenshots/property.png"
+                alt="Property app screenshot"
+                fill
+                style={{ objectFit: "cover", objectPosition: "top center" }}
+                sizes="(max-width: 768px) 100vw, 768px"
+              />
+            </div>
+            <p className="label-personal mb-2">Personal project · Discontinued · Live</p>
+            <h2 className="text-xl font-medium mb-3">
+              Property{" "}
+              <a
+                href="https://property.rogerflores.dev"
+                target="_blank" rel="noopener noreferrer"
+                className="text-sm text-[var(--accent)] hover:underline font-normal"
+              >
+                property.rogerflores.dev ↗
+              </a>
+            </h2>
+            <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
+              A property search tool I built and deployed. Still live, but no longer maintained —
+              I hit technical constraints that are better solved by starting fresh rather than
+              patching. The lessons carried forward.
+            </p>
             <p className="text-[13px] text-[var(--foreground-faint)]">
-              GitHub and writeup coming soon.
+              Live but unmaintained
             </p>
           </div>
 
           {/* Law Firm Scraper */}
           <div className="project-card">
+            <OfflinePlaceholder />
             <p className="label-personal mb-2">Automation · 3-day build</p>
             <h2 className="text-xl font-medium mb-3">
               Law Firm Lead Scraper
             </h2>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
               Someone needed structured contact data from law firm websites.
-              I built an automated
-              scraper that takes a URL as input and outputs clean, structured
+              I built an automated scraper that takes a URL as input and outputs clean, structured
               lead data in Excel format.
             </p>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-4">
               Uses Selenium for dynamic content handling and custom parsing
-              logic. Completed in three days as a practical tool for a real
-              need.
+              logic. Completed in three days as a practical tool for a real need.
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="tech-tag">Python</span>
@@ -241,6 +350,7 @@ export default function Projects() {
 
           {/* Minecraft Escape Room */}
           <div className="project-card">
+            <OfflinePlaceholder />
             <p className="label-personal mb-2">
               Game design · Collaborative build
             </p>
@@ -263,7 +373,7 @@ export default function Projects() {
               <span className="tech-tag">Project Planning</span>
             </div>
             <p className="text-[13px] text-[var(--foreground-faint)]">
-              World file available on request, {" "}
+              World file available on request,{" "}
               <a
                 href="mailto:rflores3113@gmail.com"
                 className="text-[var(--accent)] hover:underline"
