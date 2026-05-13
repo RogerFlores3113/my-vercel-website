@@ -24,8 +24,8 @@ export default function ComingSoonModal({ isOpen, onClose }: Props) {
       className="modal-backdrop"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="modal-box">
-        <button className="modal-close" onClick={onClose} aria-label="Close">×</button>
+      <div className="modal-box" role="dialog" aria-modal="true" aria-label="Coming soon">
+        <button className="modal-close" onClick={onClose} aria-label="Close" autoFocus>×</button>
         <p>Still working on it.<br />Check back later!</p>
       </div>
     </div>

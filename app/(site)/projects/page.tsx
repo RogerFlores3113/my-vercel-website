@@ -160,13 +160,15 @@ export default function Projects() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSearchModalOpen(true); }}
           >
-            <div className="offline-placeholder">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4 }}>
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <span>Screenshot coming soon</span>
-            </div>
+            <OfflinePlaceholder
+              icon={
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4 }}>
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              }
+              label="Screenshot coming soon"
+            />
             <p className="label-personal mb-2">Agentic tool · In development</p>
             <h2 className="text-xl font-medium mb-3">Search</h2>
             <p className="text-[15px] text-[var(--foreground-muted)] leading-relaxed mb-3">
