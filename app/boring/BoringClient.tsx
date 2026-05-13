@@ -2,6 +2,23 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 
+/* ── Game version link — clears boring preference before navigating ── */
+export function GameVersionLink() {
+  function handleClick(e: React.MouseEvent) {
+    e.preventDefault()
+    try { localStorage.setItem('rflor-site-mode', 'game') } catch {}
+    window.location.href = '/'
+  }
+  return (
+    <a className="gameback" href="/" onClick={handleClick} title="Go to the game version">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M7.5 2L3.5 6L7.5 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+      </svg>
+      <span>game version</span>
+    </a>
+  )
+}
+
 /* ── "Still collecting" modal for coming-soon hobby pages ── */
 export function ComingSoonLink({ children, label }: { children: React.ReactNode; label: string }) {
   const [open, setOpen] = useState(false)
