@@ -25,17 +25,20 @@ function ModalContent({ id }: { id: string }) {
   if (id === "landing") return (
     <>
       <p style={s.p}>
-        Software engineer at the intersection of full-stack and AI.
-        I&apos;m happiest when a problem requires both technical depth and
-        talking to real people.
+        AI engineer in the SF Bay Area. Northeastern CS, then production
+        work for Fortune 500s and county governments. These days I&apos;m
+        building projects that solve problems for friends and family.
       </p>
       <p style={s.p}>
-        Currently looking for SWE / AI engineering roles.
+        Open to AI engineering and founding roles. Senior IC, founding
+        engineer, or AI-focused. Bay Area or remote.
       </p>
       <p style={s.p}>
         Currently building{" "}
         <a href="https://podium.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Podium</a>
-        {" "}— a live RAG assistant.
+        {", "}
+        <a href="https://experiments.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Experiments</a>
+        {", and Search."}
       </p>
       <p style={s.p}>
         <a href="mailto:rflores3113@gmail.com" style={{ color: "#5dcaa5" }}>
@@ -55,40 +58,34 @@ function ModalContent({ id }: { id: string }) {
 
   if (id === "projects") return (
     <>
-      <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Professional</p>
-      <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>Property Appraisal Platform</strong>
-        <br />
-        Led pilot deployment for two county governments. Requirements gathering,
-        ML feature engineering, React frontend. Shipped to production despite messy
-        cross-org data pipelines.
-        <br />
-        <span style={{ color: "#5dcaa5", fontSize: 11 }}>React · Python · SQL · Cassandra</span>
-      </p>
-      <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>Inventory Optimization Platform</strong>
-        <br />
-        AI-powered demand forecasting for Fortune 500 energy and steel companies.
-        Full-stack work across React UI and large-scale database ops.
-        <br />
-        <span style={{ color: "#5dcaa5", fontSize: 11 }}>React · Python · SQL · Cassandra</span>
-      </p>
-      <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, marginTop: 16 }}>Personal</p>
+      <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Now</p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Podium</strong>{" "}
-        <a href="https://podium.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live beta</a>
+        <a href="https://podium.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
         <br />
-        RAG assistant with BYOK architecture, agentic tools, Terraform IaC on AWS.
+        Personal LLM assistant. Agentic tools, RAG database, AWS backend
+        via Terraform, Next.js frontend on Vercel. Guests get limited free usage.
         <br />
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Next.js · TypeScript · AWS · Terraform · RAG</span>
       </p>
       <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>Law Firm Lead Scraper</strong> — 3-day build.
-        URL in → structured Excel out. Python + Selenium.
+        <strong style={{ color: "#e8e6e1" }}>Experiments</strong>{" "}
+        <a href="https://experiments.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
+        <br />
+        Writeups on my own experiments tuning and running local LLMs.
+        LoRA, weight probes, math.
+        <br />
+        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Local LLMs · LoRA · Writeups</span>
       </p>
       <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>Minecraft Escape Room</strong> — ~4hrs of gameplay,
-        second room in progress.
+        <strong style={{ color: "#e8e6e1" }}>Search</strong>{" "}
+        <span style={{ color: "#73716b", fontSize: 11 }}>WIP · local-model-only</span>
+        <br />
+        Generalized agentic web search via screenshot-click loop. Collects
+        apartment listings, recruiting leads, job openings — anything in a
+        mass-search format.
+        <br />
+        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Agents · Local LLMs · Modular</span>
       </p>
     </>
   );
@@ -96,24 +93,27 @@ function ModalContent({ id }: { id: string }) {
   if (id === "about") return (
     <>
       <p style={s.p}>
-        My professional work ranges from ML-powered inventory optimization for
-        Fortune 500 companies to deploying property appraisal systems for county
-        governments. Client-facing, ambiguous, real-world problems are where
-        I do my best work.
+        AI engineer in the SF Bay Area. Northeastern CS, then production work
+        for Fortune 500s and county governments. These days I&apos;m building
+        projects that solve problems for friends and family.
+      </p>
+      <p style={s.p}>
+        I do the whole stack. I love helping other people, and I&apos;m proud
+        of what I do, but I try not to take myself too seriously while doing so.
       </p>
       <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Now</p>
       <p style={s.p}>
         Building{" "}
         <a href="https://podium.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Podium</a>
-        {" "}— RAG assistant, BYOK architecture, agentic tools, Terraform IaC on AWS.
-        <br />
-        Training toward my private pilot&apos;s license.
-        <br />
-        Running Karpathy&apos;s nanochat on a 4080 Super instead of 8×H100s.
+        {", Experiments, and Search. "}
+        Training toward my PPL (private pilot license).
       </p>
+      <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Off the clock</p>
       <p style={s.p}>
-        Board games (Terraforming Mars, Blood on the Clocktower), rock climbing,
-        flying, reading, and still searching for the perfect morning green tea.
+        Learning to fly small planes, climbing rocks indoors, walking Bay Area
+        trails, crushing people at board games (Terraforming Mars, Blood on the
+        Clocktower), and reading a stack of books that keeps growing.
+        Also red pandas — obviously.
       </p>
     </>
   );
