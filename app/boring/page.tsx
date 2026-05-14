@@ -396,10 +396,10 @@ export default function Boring() {
           <div className="seclabel" style={{ color: 'var(--rust)' }}>Open to work</div>
           <div className="cta-grid">
             <div>
-              <h4>Open to <em>AI engineering</em> and <em>founding</em> roles.</h4>
+              <h4>Open to <em>Software Engineering</em> roles.</h4>
               <p>
-                Senior IC, founding engineer, or AI-focused. Bay Area or
-                remote. Happy to chat even if the timing isn&apos;t right.
+                AI, Forward Deployed, or Founding engineering. SF Bay Area
+                or remote. Happy to chat even if the timing isn&apos;t right!
               </p>
               <a className="mail-btn" href="mailto:rflores3113@gmail.com">
                 rflores3113@gmail.com
@@ -414,7 +414,7 @@ export default function Boring() {
             <div className="cta-grid-cells">
               <div className="cell"><div className="k">Status</div><div className="v">Open · May 2026</div></div>
               <div className="cell"><div className="k">Location</div><div className="v">SF Bay Area</div></div>
-              <div className="cell"><div className="k">Looking for</div><div className="v">AI eng · founding · senior</div></div>
+              <div className="cell"><div className="k">Looking for</div><div className="v">AI · FDE · founding</div></div>
               <div className="cell"><div className="k">Reply within</div><div className="v">~24h</div></div>
             </div>
           </div>
