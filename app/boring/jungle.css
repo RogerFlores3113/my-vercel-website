@@ -43,18 +43,18 @@
   /* Layout */
   --side: clamp(20px, 6vw, 88px);
 
-  /* Design knobs */
-  --tw-rail-font:        12.5px;
-  --tw-rail-pad-y:       14px;
+  /* Design knobs (driven by the Tweaks panel in reference) */
+  --tw-rail-font:        15px;
+  --tw-rail-pad-y:       8px;
   --tw-rail-pad-x:       14px;
-  --tw-face-size:        30px;
-  --tw-badge-size:       36px;
-  --tw-badge-icon:       22px;
-  --tw-name-leading:     1.08;
-  --tw-name-letter:      -0.005em;
-  --tw-name-color-top:   #993d1f;
-  --tw-name-color-bot:   #c25a30;
-  --tw-hero-up:          44px;
+  --tw-face-size:        41px;
+  --tw-badge-size:       40px;
+  --tw-badge-icon:       32px;
+  --tw-name-leading:     1.11;
+  --tw-name-letter:      0.003em;
+  --tw-name-color-top:   #9a3f1e;
+  --tw-name-color-bot:   #b95a2c;
+  --tw-hero-up:          180px;
 }
 
 html { scroll-behavior: smooth; }
@@ -863,6 +863,18 @@ h1.name .word.last {
   height: 100%;
   display: block;
 }
+.pthumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+/* Taller variant used by the Podium hero card so the screenshot reads */
+.pwindow.big .pthumb,
+.pthumb.pthumb-tall {
+  height: 280px;
+}
 
 /* Bento grid */
 .bento {
@@ -1067,6 +1079,76 @@ h1.name .word.last {
 }
 
 /* Calendar mini widget */
+/* ── Calendar outer wrapper + slots panel ── */
+.cal-outer {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.cal-slots-panel {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 8px);
+  width: 148px;
+  background: rgba(14,22,12,0.96);
+  border: 1px solid rgba(248,239,217,0.14);
+  border-radius: 4px;
+  padding: 12px 10px 10px;
+  transform: translateX(calc(100% + 8px));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 300ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 180ms ease;
+  z-index: 10;
+}
+.cal-slots-panel.is-open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+.csp-date {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(248,239,217,0.45);
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+.csp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.csp-slot {
+  background: rgba(248,239,217,0.06);
+  border: 1px solid rgba(248,239,217,0.1);
+  border-radius: 3px;
+  color: var(--ink-cream);
+  font-size: 11px;
+  font-family: var(--mono);
+  padding: 5px 3px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 140ms, border-color 140ms, color 140ms;
+  line-height: 1;
+}
+.csp-slot:hover {
+  background: var(--rust);
+  border-color: var(--rust);
+  color: #fff;
+}
+.csp-foot {
+  margin-top: 8px;
+  font-size: 9px;
+  color: rgba(248,239,217,0.3);
+  text-align: right;
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+}
+
 .cal-mini {
   background: rgba(20,30,18,0.7);
   border: 1px solid rgba(248,239,217,0.16);
@@ -1182,6 +1264,17 @@ h1.name .word.last {
   color: rgba(216,80,46,0.5);
 }
 
+.cal-grid .day.loading {
+  color: rgba(248,239,217,0.15);
+  background: rgba(248,239,217,0.04);
+  animation: cal-pulse 1.4s ease-in-out infinite;
+  cursor: default;
+}
+@keyframes cal-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
 .cal-foot {
   margin-top: 18px;
   padding-top: 14px;
@@ -1252,14 +1345,14 @@ h1.name .word.last {
   align-items: center;
   gap: 14px;
   background: var(--ink-cream);
-  color: var(--earth);
+  color: var(--earth) !important;
   padding: 14px 20px;
   font-family: var(--mono);
   font-size: 14px;
   border-radius: 2px;
   transition: background 180ms, transform 180ms, color 180ms;
 }
-.mail-btn:hover { background: var(--rust); color: var(--ink-light); transform: translateY(-1px); }
+.mail-btn:hover { background: var(--rust); color: var(--ink-light) !important; transform: translateY(-1px); }
 .mail-btn .arrow { transition: transform 180ms; }
 .mail-btn:hover .arrow { transform: translateX(3px); }
 .mail-btn .kbd {

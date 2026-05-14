@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 /* ── Game version link — clears boring preference before navigating ── */
 export function GameVersionLink() {
@@ -22,7 +23,10 @@ export function GameVersionLink() {
 /* ── "Still collecting" modal for coming-soon hobby pages ── */
 export function ComingSoonLink({ children, label }: { children: React.ReactNode; label: string }) {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const dialogRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
     const dlg = dialogRef.current
@@ -37,7 +41,19 @@ export function ComingSoonLink({ children, label }: { children: React.ReactNode;
     const onClose = () => setOpen(false)
     dlg.addEventListener('close', onClose)
     return () => dlg.removeEventListener('close', onClose)
-  }, [])
+  }, [mounted])
+
+  const dialog = (
+    <dialog ref={dialogRef} className="coming-dialog" onClick={e => { if (e.target === e.currentTarget) setOpen(false) }}>
+      <div className="coming-dialog-inner">
+        <h3 className="coming-dialog-title">Still working on it!</h3>
+        <p className="coming-dialog-body">Check back soon!</p>
+        <button type="button" className="coming-dialog-close" onClick={() => setOpen(false)}>
+          Got it
+        </button>
+      </div>
+    </dialog>
+  )
 
   return (
     <>
@@ -48,20 +64,7 @@ export function ComingSoonLink({ children, label }: { children: React.ReactNode;
       >
         {children}
       </button>
-
-      <dialog ref={dialogRef} className="coming-dialog" onClick={e => { if (e.target === e.currentTarget) setOpen(false) }}>
-        <div className="coming-dialog-inner">
-          <div className="coming-dialog-icon" aria-hidden="true">📋</div>
-          <h3 className="coming-dialog-title">Still collecting &rsquo;em</h3>
-          <p className="coming-dialog-body">
-            My <strong>{label}</strong> log is a work in progress — I&rsquo;m just bad at keeping lists.
-            Check back soon, or ask me directly and I&rsquo;ll tell you everything.
-          </p>
-          <button type="button" className="coming-dialog-close" onClick={() => setOpen(false)}>
-            Got it
-          </button>
-        </div>
-      </dialog>
+      {mounted ? createPortal(dialog, document.body) : null}
     </>
   )
 }
@@ -123,18 +126,6 @@ export function BoringClient() {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
-  }, [])
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k' && !target.matches('input, textarea')) {
-        e.preventDefault()
-        window.location.href = 'mailto:rflores3113@gmail.com'
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
   }, [])
 
   useEffect(() => {
@@ -200,7 +191,18 @@ const DOWS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const FULL_DOWS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const BOOKING_URL = 'https://cal.com/rogerflores/15min?date={date}'
 
-function dayState(viewDate: Date, d: number): string | null {
+type LoadState = 'idle' | 'loading' | 'done' | 'error'
+
+function isoDate(year: number, month: number, day: number): string {
+  return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+function dayState(
+  viewDate: Date,
+  d: number,
+  daySlots: Record<string, string[]>,
+  loadState: LoadState,
+): string | null {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const dt = new Date(viewDate.getFullYear(), viewDate.getMonth(), d)
@@ -208,38 +210,73 @@ function dayState(viewDate: Date, d: number): string | null {
   if (dt.getTime() === today.getTime()) return 'today'
   const dow = dt.getDay()
   if (dow === 0 || dow === 6) return null
-  const seed = (dt.getDate() * 31 + dt.getMonth() * 17 + dt.getFullYear()) % 9
-  if (seed === 3 || seed === 7) return 'full'
-  return 'avail'
+  if (loadState !== 'done') return 'loading'
+  const key = isoDate(viewDate.getFullYear(), viewDate.getMonth(), d)
+  return key in daySlots ? 'avail' : 'full'
+}
+
+function formatSlot(slot: string): string {
+  const [h, m] = slot.split(':')
+  return `${parseInt(h)}:${m}`
+}
+
+function formatSlotDate(dateStr: string): string {
+  return new Date(dateStr + 'T12:00:00Z').toLocaleDateString('en-US', {
+    timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric',
+  })
 }
 
 export function CalendarWidget() {
   const [mounted, setMounted] = useState(false)
   const [viewDate, setViewDate] = useState<Date>(() => {
-    const d = new Date()
-    d.setDate(1)
-    return d
+    const d = new Date(); d.setDate(1); return d
   })
   const [tz, setTz] = useState('your local tz')
+  const [daySlots, setDaySlots] = useState<Record<string, string[]>>({})
+  const [loadState, setLoadState] = useState<LoadState>('idle')
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null)
+  const [panelOpen, setPanelOpen] = useState(false)
+  const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     setMounted(true)
     try { setTz(Intl.DateTimeFormat().resolvedOptions().timeZone) } catch {}
   }, [])
 
+  useEffect(() => {
+    if (!mounted) return
+    const y = viewDate.getFullYear()
+    const m = viewDate.getMonth()
+    setLoadState('loading')
+    fetch(`/api/availability?year=${y}&month=${m}`)
+      .then(r => r.json())
+      .then(data => { setDaySlots(data.days ?? {}); setLoadState('done') })
+      .catch(() => setLoadState('error'))
+  }, [mounted, viewDate])
+
+  const showPanel = useCallback((dateKey: string) => {
+    clearTimeout(hideTimer.current)
+    setHoveredDate(dateKey)
+    setPanelOpen(true)
+  }, [])
+
+  const scheduleHide = useCallback(() => {
+    hideTimer.current = setTimeout(() => { setPanelOpen(false); setHoveredDate(null) }, 140)
+  }, [])
+
+  const cancelHide = useCallback(() => clearTimeout(hideTimer.current), [])
+
+  useEffect(() => () => clearTimeout(hideTimer.current), [])
+
   const goMonth = useCallback((delta: number) => {
     setViewDate(prev => {
-      const next = new Date(prev)
-      next.setMonth(next.getMonth() + delta)
-      return next
+      const next = new Date(prev); next.setMonth(next.getMonth() + delta); return next
     })
   }, [])
 
-  const openBooking = useCallback((d: number) => {
-    const dt = new Date(viewDate.getFullYear(), viewDate.getMonth(), d)
-    const iso = dt.toISOString().slice(0, 10)
-    window.open(BOOKING_URL.replace('{date}', iso), '_blank', 'noopener')
-  }, [viewDate])
+  const openBooking = useCallback((dateKey: string) => {
+    window.open(BOOKING_URL.replace('{date}', dateKey), '_blank', 'noopener')
+  }, [])
 
   const y = viewDate.getFullYear()
   const m = viewDate.getMonth()
@@ -251,12 +288,12 @@ export function CalendarWidget() {
   DOWS.forEach((dow, i) => cells.push(<div key={`dow-${i}`} className="dow">{dow}</div>))
   for (let i = 0; i < firstDow; i++) cells.push(<div key={`e-${i}`} className="day empty" />)
   for (let d = 1; d <= daysInMonth; d++) {
-    const state = mounted ? dayState(viewDate, d) : null
+    const state = mounted ? dayState(viewDate, d, daySlots, loadState) : null
     const cls = state ? `day ${state}` : 'day'
     const dt = new Date(y, m, d)
     const aria = `${FULL_DOWS[dt.getDay()]} ${monthName.split(' ')[0]} ${d}`
+    const dateKey = isoDate(y, m, d)
     if (state === 'avail') {
-      const dayNum = d
       cells.push(
         <button
           type="button"
@@ -264,7 +301,8 @@ export function CalendarWidget() {
           className={cls}
           data-day={d}
           aria-label={`Book ${aria}, 15 min available`}
-          onClick={() => openBooking(dayNum)}
+          onMouseEnter={() => showPanel(dateKey)}
+          onClick={() => openBooking(dateKey)}
         >{d}</button>
       )
     } else {
@@ -272,31 +310,63 @@ export function CalendarWidget() {
     }
   }
 
+  const slots = hoveredDate ? (daySlots[hoveredDate] ?? []) : []
+
   return (
-    <div className="cal-mini" aria-label="Booking calendar">
-      <div className="cal-head">
-        <span className="month">{mounted ? monthName : '…'}</span>
-        <div className="nav">
-          <button className="prev" aria-label="Previous month" onClick={() => goMonth(-1)}>
-            <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-              <path d="M6 1L3 4.5L6 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="square" />
-            </svg>
-          </button>
-          <button className="next" aria-label="Next month" onClick={() => goMonth(1)}>
-            <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-              <path d="M3 1L6 4.5L3 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="square" />
-            </svg>
-          </button>
-        </div>
+    <div className="cal-outer" onMouseLeave={scheduleHide}>
+      {/* Slots panel — slides out from behind the calendar to the left */}
+      <div
+        className={`cal-slots-panel${panelOpen ? ' is-open' : ''}`}
+        onMouseEnter={cancelHide}
+        onMouseLeave={scheduleHide}
+        aria-hidden={!panelOpen}
+      >
+        {hoveredDate && (
+          <>
+            <div className="csp-date">{formatSlotDate(hoveredDate)}</div>
+            <div className="csp-grid">
+              {slots.map(slot => (
+                <button
+                  key={slot}
+                  type="button"
+                  className="csp-slot"
+                  onClick={() => openBooking(hoveredDate)}
+                  aria-label={`Book ${slot} PST`}
+                >
+                  {formatSlot(slot)}
+                </button>
+              ))}
+            </div>
+            <div className="csp-foot">PST · 15 min</div>
+          </>
+        )}
       </div>
-      <div className="cal-grid">{cells}</div>
-      <div className="cal-foot">
-        <div className="legend">
-          <span><span className="sw avail" />Open</span>
-          <span><span className="sw full" />Full</span>
-          <span><span className="sw tz" /><span>{tz}</span></span>
+
+      <div className="cal-mini" aria-label="Booking calendar">
+        <div className="cal-head">
+          <span className="month">{mounted ? monthName : '…'}</span>
+          <div className="nav">
+            <button className="prev" aria-label="Previous month" onClick={() => goMonth(-1)}>
+              <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                <path d="M6 1L3 4.5L6 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="square" />
+              </svg>
+            </button>
+            <button className="next" aria-label="Next month" onClick={() => goMonth(1)}>
+              <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                <path d="M3 1L6 4.5L3 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="square" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <span>15 min · ☎ or video</span>
+        <div className="cal-grid">{cells}</div>
+        <div className="cal-foot">
+          <div className="legend">
+            <span><span className="sw avail" />Open</span>
+            <span><span className="sw full" />Full</span>
+            <span><span className="sw tz" /><span>{tz}</span></span>
+          </div>
+          <span>15 min · ☎ or video</span>
+        </div>
       </div>
     </div>
   )

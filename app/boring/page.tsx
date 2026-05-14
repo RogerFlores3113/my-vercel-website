@@ -186,7 +186,7 @@ export default function Boring() {
                 <ComingSoonLink label="climbing log">climbing rocks indoors</ComingSoonLink>, walking{' '}
                 <ComingSoonLink label="trails list">Bay Area trails</ComingSoonLink>, crushing people in{' '}
                 <ComingSoonLink label="games list">board games</ComingSoonLink>, and reading{' '}
-                <a href="/reading">a stack of books that keeps on growing D:</a>.
+                <ComingSoonLink label="reading list">a stack of books that keeps on growing D:</ComingSoonLink>.
                 Also red pandas... obviously.
               </p>
               <p>
@@ -226,17 +226,16 @@ export default function Boring() {
             <div className="ph-left">
               <h3 className="ph-title">
                 Podium
-                <span className="ph-status"><span className="pulse" />Beta · Live</span>
+                <span className="ph-status"><span className="pulse" />Live</span>
               </h3>
               <a className="ph-url" href="https://podium.rogerflores.dev" target="_blank" rel="noopener">
                 podium.rogerflores.dev
                 <span className="arrow">↗</span>
               </a>
               <p className="ph-body">
-                A RAG assistant with <em>bring-your-own-key</em> architecture.
-                Agentic tools, multiple LLM backends, Terraform-managed
-                infrastructure on AWS. Built for teams that want their own
-                data, their own keys, their own control.
+                A personal LLM assistant. Agentic tools, RAG database,
+                AWS backend via Terraform, Next.js frontend on Vercel.
+                Try it out! Guests get limited free usage.
               </p>
               <div className="ph-cells">
                 <div className="cell"><div className="k">Stack</div><div className="v">Next.js <small>app router</small></div></div>
@@ -252,33 +251,8 @@ export default function Boring() {
                   <span className="dot r" /><span className="dot y" /><span className="dot g" />
                   <span className="url">podium.rogerflores.dev</span>
                 </div>
-                <div className="pthumb">
-                  <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
-                    <defs>
-                      <linearGradient id="podBg" x1="0" x2="1" y1="0" y2="1">
-                        <stop offset="0" stopColor="#241a14" />
-                        <stop offset="1" stopColor="#0e0a08" />
-                      </linearGradient>
-                    </defs>
-                    <rect width="320" height="200" fill="url(#podBg)" />
-                    <rect x="0" y="0" width="60" height="200" fill="#1a120c" />
-                    <rect x="10" y="14" width="40" height="6" rx="2" fill="#c25a30" />
-                    <rect x="10" y="36" width="34" height="4" rx="1" fill="#f4ead0" opacity="0.5" />
-                    <rect x="10" y="46" width="38" height="4" rx="1" fill="#f4ead0" opacity="0.4" />
-                    <rect x="10" y="56" width="30" height="4" rx="1" fill="#f4ead0" opacity="0.3" />
-                    <rect x="80" y="20" width="180" height="8" rx="2" fill="#f4ead0" opacity="0.6" />
-                    <rect x="80" y="34" width="120" height="6" rx="2" fill="#f4ead0" opacity="0.4" />
-                    <rect x="80" y="60" width="220" height="32" rx="6" fill="#2c2218" stroke="#3a2a1c" />
-                    <rect x="92" y="72" width="180" height="4" rx="2" fill="#f4ead0" opacity="0.5" />
-                    <rect x="92" y="80" width="140" height="4" rx="2" fill="#f4ead0" opacity="0.4" />
-                    <rect x="80" y="106" width="200" height="42" rx="6" fill="#3d2418" stroke="#5a3525" />
-                    <rect x="92" y="118" width="160" height="4" rx="2" fill="#f4ead0" opacity="0.7" />
-                    <rect x="92" y="126" width="120" height="4" rx="2" fill="#f4ead0" opacity="0.55" />
-                    <rect x="92" y="134" width="170" height="4" rx="2" fill="#c25a30" opacity="0.7" />
-                    <rect x="80" y="166" width="220" height="20" rx="10" fill="#1a120c" stroke="#3a2a1c" />
-                    <rect x="92" y="173" width="100" height="6" rx="2" fill="#f4ead0" opacity="0.4" />
-                    <circle cx="288" cy="176" r="6" fill="#c25a30" />
-                  </svg>
+                <div className="pthumb pthumb-tall">
+                  <img src="/screenshots/podium.png" alt="Podium screenshot" />
                 </div>
               </div>
             </div>
@@ -287,93 +261,33 @@ export default function Boring() {
           {/* Bento grid */}
           <div className="bento" data-page="1">
 
-            {/* Longdle */}
-            <a className="bcard" href="https://longdle.rogerflores.dev" target="_blank" rel="noopener" data-page="1">
-              <div className="pwindow">
-                <div className="pbar"><span className="dot r" /><span className="dot y" /><span className="dot g" /><span className="url">longdle.rogerflores.dev</span></div>
-                <div className="pthumb">
-                  <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
-                    <rect width="320" height="200" fill="#1a2818" />
-                    <rect x="20" y="18" width="86" height="10" rx="2" fill="#f4ead0" opacity="0.85" />
-                    <g><rect x="60" y="48" width="32" height="32" fill="#5e8a48" /><rect x="96" y="48" width="32" height="32" fill="#5e8a48" /><rect x="132" y="48" width="32" height="32" fill="#c39c3a" /><rect x="168" y="48" width="32" height="32" fill="#3a3a3a" /><rect x="204" y="48" width="32" height="32" fill="#5e8a48" /><rect x="60" y="84" width="32" height="32" fill="#5e8a48" /><rect x="96" y="84" width="32" height="32" fill="#5e8a48" /><rect x="132" y="84" width="32" height="32" fill="#5e8a48" /><rect x="168" y="84" width="32" height="32" fill="#5e8a48" /><rect x="204" y="84" width="32" height="32" fill="#5e8a48" /></g>
-                    <g fill="#f4ead0" fontFamily="JetBrains Mono,monospace" fontSize="16" textAnchor="middle" fontWeight="500"><text x="76" y="70">L</text><text x="112" y="70">O</text><text x="148" y="70">N</text><text x="184" y="70">G</text><text x="220" y="70">R</text><text x="76" y="106">L</text><text x="112" y="106">O</text><text x="148" y="106">N</text><text x="184" y="106">G</text><text x="220" y="106">D</text></g>
-                    <g fill="#3a4a32"><rect x="40" y="150" width="22" height="16" rx="2" /><rect x="64" y="150" width="22" height="16" rx="2" /><rect x="88" y="150" width="22" height="16" rx="2" /><rect x="112" y="150" width="22" height="16" rx="2" /><rect x="136" y="150" width="22" height="16" rx="2" /><rect x="160" y="150" width="22" height="16" rx="2" /><rect x="184" y="150" width="22" height="16" rx="2" /><rect x="208" y="150" width="22" height="16" rx="2" /><rect x="232" y="150" width="22" height="16" rx="2" /><rect x="256" y="150" width="22" height="16" rx="2" /></g>
-                  </svg>
-                </div>
-                <div className="pmeta">
-                  <div className="ptitle">Longdle <span className="badge live">Live</span></div>
-                  <p className="pblurb">Daily word game. Longer words, fewer guesses, for the patient.</p>
-                  <div className="ptags"><span className="ptag">Next.js</span><span className="ptag">Edge</span><span className="ptag">Daily</span></div>
-                  <div className="popen"><span>Open</span><span className="arrow">↗</span></div>
-                </div>
-              </div>
-            </a>
-
-            {/* Short */}
-            <a className="bcard" href="https://short.rogerflores.dev" target="_blank" rel="noopener" data-page="1">
-              <div className="pwindow">
-                <div className="pbar"><span className="dot r" /><span className="dot y" /><span className="dot g" /><span className="url">short.rogerflores.dev</span></div>
-                <div className="pthumb">
-                  <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
-                    <rect width="320" height="200" fill="#0e1410" />
-                    <rect x="40" y="40" width="240" height="44" rx="6" fill="#1a2418" stroke="#3d5a3a" />
-                    <text x="56" y="68" fill="#c25a30" fontFamily="JetBrains Mono,monospace" fontSize="18" fontWeight="500">rf.gg/</text>
-                    <text x="116" y="68" fill="#f4ead0" fontFamily="JetBrains Mono,monospace" fontSize="18" fontWeight="500">podium</text>
-                    <g stroke="#5e8a48" strokeWidth="2" fill="none" strokeLinecap="round"><path d="M250 56 l8 0 a6 6 0 0 1 0 12 l-4 0" /><path d="M270 68 l-8 0 a6 6 0 0 1 0 -12 l4 0" /></g>
-                    <rect x="40" y="106" width="60" height="6" rx="2" fill="#f4ead0" opacity="0.5" />
-                    <rect x="40" y="120" width="240" height="3" rx="1" fill="#f4ead0" opacity="0.15" />
-                    <rect x="40" y="134" width="40" height="6" rx="2" fill="#f4ead0" opacity="0.4" />
-                    <rect x="120" y="134" width="60" height="6" rx="2" fill="#c25a30" opacity="0.7" />
-                    <rect x="40" y="150" width="240" height="3" rx="1" fill="#f4ead0" opacity="0.15" />
-                    <rect x="40" y="164" width="80" height="6" rx="2" fill="#f4ead0" opacity="0.4" />
-                    <rect x="180" y="164" width="40" height="6" rx="2" fill="#5e8a48" opacity="0.7" />
-                    <g fill="#3d5a3a"><rect x="220" y="98" width="6" height="14" /><rect x="230" y="92" width="6" height="20" /><rect x="240" y="86" width="6" height="26" /><rect x="250" y="80" width="6" height="32" /><rect x="260" y="74" width="6" height="38" /><rect x="270" y="68" width="6" height="44" /></g>
-                  </svg>
-                </div>
-                <div className="pmeta">
-                  <div className="ptitle">Short <span className="badge live">Live</span></div>
-                  <p className="pblurb">URL shortener. Vanity slugs, analytics, expiring links.</p>
-                  <div className="ptags"><span className="ptag">Workers</span><span className="ptag">KV</span><span className="ptag">Hono</span></div>
-                  <div className="popen"><span>Open</span><span className="arrow">↗</span></div>
-                </div>
-              </div>
-            </a>
-
             {/* Experiments */}
             <a className="bcard" href="https://experiments.rogerflores.dev" target="_blank" rel="noopener" data-page="1">
               <div className="pwindow">
                 <div className="pbar"><span className="dot r" /><span className="dot y" /><span className="dot g" /><span className="url">experiments.rogerflores.dev</span></div>
                 <div className="pthumb">
-                  <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
-                    <rect width="320" height="200" fill="#181f15" />
-                    <rect x="22" y="18" width="120" height="10" rx="2" fill="#f4ead0" opacity="0.8" />
-                    <rect x="22" y="32" width="80" height="6" rx="2" fill="#c25a30" opacity="0.7" />
-                    <g>
-                      <rect x="22" y="60" width="84" height="56" rx="4" fill="#243824" stroke="#3d5a3a" />
-                      <rect x="118" y="60" width="84" height="56" rx="4" fill="#243824" stroke="#3d5a3a" />
-                      <rect x="214" y="60" width="84" height="56" rx="4" fill="#243824" stroke="#3d5a3a" strokeDasharray="3 3" />
-                      <rect x="22" y="124" width="84" height="56" rx="4" fill="#243824" stroke="#3d5a3a" />
-                      <rect x="118" y="124" width="84" height="56" rx="4" fill="#243824" stroke="#3d5a3a" strokeDasharray="3 3" />
-                      <rect x="214" y="124" width="84" height="56" rx="4" fill="#1a200f" stroke="#3d5a3a" strokeDasharray="3 3" opacity="0.6" />
-                    </g>
-                    <g stroke="#c25a30" strokeWidth="1.5" fill="none">
-                      <path d="M30 96 Q44 78 58 92 T 98 88" />
-                      <path d="M126 96 Q140 80 154 96" />
-                      <path d="M30 160 Q50 140 70 156 T 98 152" />
-                    </g>
-                    <g fill="#f4ead0" opacity="0.65">
-                      <rect x="30" y="72" width="32" height="3" rx="1" />
-                      <rect x="126" y="72" width="42" height="3" rx="1" />
-                      <rect x="222" y="72" width="28" height="3" rx="1" opacity="0.5" />
-                      <rect x="30" y="136" width="36" height="3" rx="1" />
-                      <rect x="126" y="136" width="24" height="3" rx="1" opacity="0.5" />
-                    </g>
-                  </svg>
+                  <img src="/screenshots/experiments.png" alt="Experiments screenshot" />
                 </div>
                 <div className="pmeta">
-                  <div className="ptitle">Experiments <span className="badge wip">WIP</span></div>
-                  <p className="pblurb">A graveyard and a playground for half-built ideas.</p>
-                  <div className="ptags"><span className="ptag">Various</span></div>
+                  <div className="ptitle">Experiments <span className="badge live">Live</span></div>
+                  <p className="pblurb">A site where I post writeups on my own experiments tuning and running local LLMs. LoRA, weight probes, math.</p>
+                  <div className="ptags"><span className="ptag">LLMs</span><span className="ptag">LoRA</span><span className="ptag">Writeups</span></div>
+                  <div className="popen"><span>Open</span><span className="arrow">↗</span></div>
+                </div>
+              </div>
+            </a>
+
+            {/* Longdle */}
+            <a className="bcard" href="https://longdle.rogerflores.dev" target="_blank" rel="noopener" data-page="1">
+              <div className="pwindow">
+                <div className="pbar"><span className="dot r" /><span className="dot y" /><span className="dot g" /><span className="url">longdle.rogerflores.dev</span></div>
+                <div className="pthumb">
+                  <img src="/screenshots/longdle.png" alt="Longdle screenshot" />
+                </div>
+                <div className="pmeta">
+                  <div className="ptitle">Longdle <span className="badge live">Live</span></div>
+                  <p className="pblurb">Daily wordle, but with 6 letters instead of 5. Infinite replayability via a randomizer mode. Try if you dare!</p>
+                  <div className="ptags"><span className="ptag">Next.js</span><span className="ptag">Edge</span><span className="ptag">Daily</span></div>
                   <div className="popen"><span>Open</span><span className="arrow">↗</span></div>
                 </div>
               </div>
@@ -384,51 +298,63 @@ export default function Boring() {
               <div className="pwindow">
                 <div className="pbar"><span className="dot r" /><span className="dot y" /><span className="dot g" /><span className="url">property.rogerflores.dev</span></div>
                 <div className="pthumb">
-                  <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
-                    <rect width="320" height="200" fill="#15201c" />
-                    <g stroke="#3d5a3a" strokeWidth="1" fill="none" opacity="0.5">
-                      <path d="M0 60 L320 50" /><path d="M0 110 L320 130" /><path d="M60 0 L70 200" /><path d="M180 0 L195 200" /><path d="M260 0 L255 200" />
-                    </g>
-                    <g>
-                      <rect x="80" y="70" width="80" height="50" fill="#243824" stroke="#5e7d56" />
-                      <rect x="170" y="60" width="60" height="40" fill="#243824" stroke="#5e7d56" />
-                      <rect x="170" y="110" width="80" height="50" fill="#3d2418" stroke="#c25a30" />
-                      <rect x="80" y="130" width="50" height="40" fill="#243824" stroke="#5e7d56" />
-                    </g>
-                    <g transform="translate(208 122)">
-                      <circle cx="0" cy="0" r="10" fill="#c25a30" />
-                      <circle cx="0" cy="0" r="3" fill="#f4ead0" />
-                    </g>
-                    <rect x="0" y="0" width="60" height="200" fill="#1a2418" opacity="0.95" />
-                    <rect x="10" y="20" width="40" height="6" rx="2" fill="#c25a30" opacity="0.8" />
-                    <rect x="10" y="36" width="36" height="3" rx="1" fill="#f4ead0" opacity="0.4" />
-                    <rect x="10" y="44" width="30" height="3" rx="1" fill="#f4ead0" opacity="0.3" />
-                    <rect x="10" y="64" width="40" height="3" rx="1" fill="#f4ead0" opacity="0.4" />
-                    <rect x="10" y="72" width="28" height="3" rx="1" fill="#f4ead0" opacity="0.3" />
-                    <rect x="10" y="92" width="40" height="3" rx="1" fill="#f4ead0" opacity="0.4" />
-                    <rect x="10" y="100" width="32" height="3" rx="1" fill="#f4ead0" opacity="0.3" />
-                  </svg>
+                  <img src="/screenshots/property.png" alt="Property screenshot" />
                 </div>
                 <div className="pmeta">
-                  <div className="ptitle">Property <span className="badge wip">WIP</span></div>
-                  <p className="pblurb">Tools and notes around residential property data.</p>
+                  <div className="ptitle">Property <span className="badge wip">Discontinued</span></div>
+                  <p className="pblurb">Discontinued, but live. I realized it had technical hurdles best solved by making a new project.</p>
                   <div className="ptags"><span className="ptag">Data</span></div>
                   <div className="popen"><span>Open</span><span className="arrow">↗</span></div>
                 </div>
               </div>
             </a>
 
-            {/* More to come */}
-            <div className="bcard coming" data-page="1" aria-hidden="true">
+            {/* Short */}
+            <a className="bcard" href="https://short.rogerflores.dev" target="_blank" rel="noopener" data-page="1">
               <div className="pwindow">
-                <div className="pbar"><span className="dot d" /><span className="dot d" /><span className="dot d" /><span className="url">more.coming.soon</span></div>
+                <div className="pbar"><span className="dot r" /><span className="dot y" /><span className="dot g" /><span className="url">short.rogerflores.dev</span></div>
                 <div className="pthumb">
-                  <div className="dots-three" aria-hidden="true"><span /><span /><span /></div>
+                  <img src="/screenshots/short.png" alt="Short screenshot" />
                 </div>
                 <div className="pmeta">
-                  <div className="ptitle">More to come</div>
-                  <p className="pblurb">A few things still in the workshop. Ask me if you&apos;re curious.</p>
-                  <div className="ptags"><span className="ptag muted">·</span><span className="ptag muted">·</span><span className="ptag muted">·</span></div>
+                  <div className="ptitle">Short <span className="badge live">Live</span></div>
+                  <p className="pblurb">A URL shortener project. Simple, minimal, functional. A test of my own system design and fundamentals.</p>
+                  <div className="popen"><span>Open</span><span className="arrow">↗</span></div>
+                </div>
+              </div>
+            </a>
+
+            {/* Search */}
+            <div className="bcard coming" data-page="1" aria-hidden="true">
+              <div className="pwindow">
+                <div className="pbar"><span className="dot d" /><span className="dot d" /><span className="dot d" /><span className="url">search.rogerflores.dev</span></div>
+                <div className="pthumb">
+                  <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+                    <rect width="320" height="200" fill="#15201c" />
+                    <g stroke="#3d5a3a" strokeWidth="1" fill="#1a2418">
+                      <rect x="30" y="34" width="200" height="120" rx="4" />
+                      <rect x="60" y="54" width="200" height="120" rx="4" />
+                      <rect x="90" y="74" width="200" height="120" rx="4" />
+                    </g>
+                    <g stroke="#c25a30" strokeWidth="2" fill="none" strokeLinecap="round">
+                      <path d="M50 50 L80 70" />
+                      <path d="M80 90 L110 110" />
+                      <path d="M110 130 L140 150" />
+                    </g>
+                    <g fill="#f4ead0">
+                      <path d="M200 110 L210 124 L204 124 L208 134 L204 136 L200 126 L196 130 Z" />
+                    </g>
+                    <g fill="#f4ead0" opacity="0.5">
+                      <rect x="100" y="90" width="80" height="3" rx="1" />
+                      <rect x="100" y="100" width="60" height="3" rx="1" />
+                      <rect x="100" y="110" width="70" height="3" rx="1" />
+                    </g>
+                  </svg>
+                </div>
+                <div className="pmeta">
+                  <div className="ptitle">Search <span className="badge wip">WIP</span></div>
+                  <p className="pblurb">LLM-powered screenshot-click-screenshot-click agent loop. The successor to my property project. Collects apartment listings, recruiting leads, job openings, anything that fits a mass search format.</p>
+                  <div className="ptags"><span className="ptag">Agents</span><span className="ptag">LLMs</span><span className="ptag">Modular</span></div>
                   <div className="popen muted"><span>Soon</span></div>
                 </div>
               </div>
@@ -478,7 +404,6 @@ export default function Boring() {
               <a className="mail-btn" href="mailto:rflores3113@gmail.com">
                 rflores3113@gmail.com
                 <span className="arrow">→</span>
-                <span className="kbd">⌘ K</span>
               </a>
               <div className="cta-also">
                 or grab the <a href="https://rogerflores.dev/rflores_resume.pdf">resume (pdf)</a> ·{' '}
