@@ -30,8 +30,8 @@ function ModalContent({ id }: { id: string }) {
         building projects that solve problems for friends and family.
       </p>
       <p style={s.p}>
-        Open to AI engineering and founding roles. Senior IC, founding
-        engineer, or AI-focused. Bay Area or remote.
+        Open to AI engineering and founding roles. Founding engineer
+        or AI-focused. Bay Area or remote.
       </p>
       <p style={s.p}>
         Currently building{" "}
@@ -82,7 +82,7 @@ function ModalContent({ id }: { id: string }) {
         <span style={{ color: "#73716b", fontSize: 11 }}>WIP · local-model-only</span>
         <br />
         Generalized agentic web search via screenshot-click loop. Collects
-        apartment listings, recruiting leads, job openings — anything in a
+        apartment listings, recruiting leads, job openings, anything in a
         mass-search format.
         <br />
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Agents · Local LLMs · Modular</span>
@@ -113,7 +113,7 @@ function ModalContent({ id }: { id: string }) {
         Learning to fly small planes, climbing rocks indoors, walking Bay Area
         trails, crushing people at board games (Terraforming Mars, Blood on the
         Clocktower), and reading a stack of books that keeps growing.
-        Also red pandas — obviously.
+        Also red pandas, obviously.
       </p>
     </>
   );
@@ -122,31 +122,31 @@ function ModalContent({ id }: { id: string }) {
     <>
       <p style={{ ...s.p, color: "#9fe1cb" }}>2026 reads</p>
       <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>Atomic Habits</strong> — Clear
+        <strong style={{ color: "#e8e6e1" }}>Atomic Habits</strong> | Clear
         <br />
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Currently reading</span>
         {" · "}Very good, easy read. Highly recommend.
       </p>
       <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>Foundation</strong> — Asimov
+        <strong style={{ color: "#e8e6e1" }}>Foundation</strong> | Asimov
         <br />
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Worth reading</span>
         {" · "}1950s vibes but fascinating to see where sci-fi started.
       </p>
       <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>A Random Walk Down Wall Street</strong> — Malkiel
+        <strong style={{ color: "#e8e6e1" }}>A Random Walk Down Wall Street</strong> | Malkiel
         <br />
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Loved it</span>
         {" · "}Solid framework for making good money decisions.
       </p>
       <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>Runnin&apos; Down a Dream</strong> — Gurley
+        <strong style={{ color: "#e8e6e1" }}>Runnin&apos; Down a Dream</strong> | Gurley
         <br />
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Good reference</span>
         {" · "}The reading list at the end is worth the price alone.
       </p>
       <p style={{ ...s.p, color: "#73716b" }}>
-        Recommendations welcome —{" "}
+        Recommendations welcome:{" "}
         <a href="mailto:rflores3113@gmail.com" style={{ color: "#5dcaa5" }}>send me one</a>
       </p>
     </>
