@@ -275,34 +275,54 @@ function Modal({ modalId, onClose, isTouch }: { modalId: string; onClose: () => 
   };
   return (
     <div
-      onClick={onClose}
+      // Desktop: click the backdrop to close. Touch: close only on a fresh press
+      // that both starts and ends on the backdrop — so the trailing pointer-up
+      // from the READ tap that opened this modal can't immediately close it.
+      onClick={isTouch ? undefined : onClose}
+      onPointerDown={isTouch ? (e) => { if (e.target === e.currentTarget) onClose(); } : undefined}
       style={{
         position: "fixed", inset: 0, zIndex: 100,
         display: "flex", alignItems: "center", justifyContent: "center",
         background: "rgba(0,0,0,0.75)",
       }}
     >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          background: "#1a2e1a",
-          border: "2px solid #4a7c3f",
-          borderRadius: 10,
-          padding: "clamp(22px, 3vw, 40px) clamp(24px, 3.5vw, 44px)",
-          width: "clamp(320px, 55vw, 680px)",
-          maxHeight: "85vh",
-          overflowY: "auto",
-          fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif",
-          color: "#a8a69e",
-        }}
-      >
-        <h2 style={{ color: "#9fe1cb", marginBottom: 18, fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 600 }}>
-          {titles[modalId]}
-        </h2>
-        <ModalContent id={modalId} />
-        <div style={{ marginTop: 22, borderTop: "1px solid #2d4a1e", paddingTop: 14, fontSize: "clamp(12px, 1vw, 14px)", color: "#4a7c3f", display: "flex", gap: 16 }}>
-          <span>{isTouch ? "tap outside to close" : "[ESC] close"}</span>
-          <a href="/boring" style={{ color: "#4a7c3f" }}>Traditional website →</a>
+      <div style={{ position: "relative" }}>
+        {isTouch && (
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            style={{
+              position: "absolute", top: 8, right: 10, zIndex: 1,
+              background: "none", border: "none", color: "#4a7c3f",
+              fontFamily: "inherit", fontSize: 26, lineHeight: 1,
+              cursor: "pointer", padding: 6,
+            }}
+          >
+            ✕
+          </button>
+        )}
+        <div
+          onClick={e => e.stopPropagation()}
+          style={{
+            background: "#1a2e1a",
+            border: "2px solid #4a7c3f",
+            borderRadius: 10,
+            padding: "clamp(22px, 3vw, 40px) clamp(24px, 3.5vw, 44px)",
+            width: "clamp(320px, 55vw, 680px)",
+            maxHeight: "85vh",
+            overflowY: "auto",
+            fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif",
+            color: "#a8a69e",
+          }}
+        >
+          <h2 style={{ color: "#9fe1cb", marginBottom: 18, fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 600 }}>
+            {titles[modalId]}
+          </h2>
+          <ModalContent id={modalId} />
+          <div style={{ marginTop: 22, borderTop: "1px solid #2d4a1e", paddingTop: 14, fontSize: "clamp(12px, 1vw, 14px)", color: "#4a7c3f", display: "flex", gap: 16 }}>
+            <span>{isTouch ? "tap outside or ✕ to close" : "[ESC] close"}</span>
+            <a href="/boring" style={{ color: "#4a7c3f" }}>Traditional website →</a>
+          </div>
         </div>
       </div>
     </div>
