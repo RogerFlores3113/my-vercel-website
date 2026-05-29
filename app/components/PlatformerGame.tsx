@@ -8,6 +8,11 @@ const ROOMS = [
   { key: "landing" },
 ] as const;
 
+// The room is laid out against a logical world at least this wide, so a narrow
+// (mobile) viewport doesn't compress everything. The camera follows the player
+// and scrolls horizontally to the world edges. Wider screens use their own width.
+const MIN_WORLD_WIDTH = 1280;
+
 // Animation dirs on disk (hardcoded to avoid metadata.json key mismatch)
 const ANIM_DIRS = {
   idle:  "Idle-8d50bd6c",
@@ -544,6 +549,7 @@ export function PlatformerGame() {
         private transitioning = false;
         private entryFromLeft = true;
         private platforms!: Phaser.Physics.Arcade.StaticGroup;
+        private worldW = 0; // logical world width (>= viewport); camera scrolls across it
         // Mist (chunky individual sprites)
         private mistSprites: Array<{ img: Phaser.GameObjects.Image; vx: number }> = [];
         // Dad-joke bubble
@@ -662,7 +668,11 @@ export function PlatformerGame() {
         }
 
         create() {
-          const { width, height } = this.scale;
+          const { width: viewW, height } = this.scale;
+          // World is at least MIN_WORLD_WIDTH so narrow screens scroll instead of
+          // cramming the whole room into the viewport. `width` = world width below.
+          const width = Math.max(viewW, MIN_WORLD_WIDTH);
+          this.worldW = width;
           const groundY = Math.round(height * 0.72);
           const theme   = THEMES[this.roomIndex];
 
@@ -810,7 +820,7 @@ export function PlatformerGame() {
           const label = this.roomIndex === 0 ? "~/" : `~/${ROOMS[this.roomIndex].key}`;
           this.add.text(14, 10, label, {
             fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "14px", color: theme.labelColor,
-          }).setAlpha(0.7).setDepth(D_UI);
+          }).setAlpha(0.7).setDepth(D_UI).setScrollFactor(0);
 
           // Instructions — room 0 only, top-center. Touch devices get touch hints.
           if (this.roomIndex === 0) {
@@ -821,14 +831,16 @@ export function PlatformerGame() {
             const instructions = touchLike
               ? "◀ ▶ move  ·  JUMP  ·  READ signs  ·  ⏸ menu"
               : "WASD / Arrow Keys  ·  SHIFT to sprint  ·  ESC to pause";
-            this.add.text(width / 2, 18, instructions, {
+            // Pinned to the camera (scrollFactor 0) and centered on the visible
+            // viewport, not the wider world.
+            this.add.text(viewW / 2, 18, instructions, {
               fontFamily: "Arial, Helvetica, sans-serif",
               fontStyle: "bold",
               fontSize: "16px",
               color: "#ffffff",
               stroke: "#000000",
               strokeThickness: 3,
-            }).setOrigin(0.5, 0).setAlpha(0.92).setDepth(D_UI);
+            }).setOrigin(0.5, 0).setAlpha(0.92).setDepth(D_UI).setScrollFactor(0);
           }
 
 
@@ -1101,6 +1113,10 @@ export function PlatformerGame() {
           this.shiftKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
           this.escKey   = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
+          // Camera follows the panda across the world. On screens >= world width
+          // there's nothing to scroll (bounds == viewport), so desktop is unchanged.
+          this.cameras.main.setBounds(0, 0, width, height);
+          this.cameras.main.startFollow(this.player, true, 0.15, 0.15);
           this.cameras.main.fadeIn(200, 0, 0, 0);
         }
 
@@ -1114,7 +1130,7 @@ export function PlatformerGame() {
 
           const body     = this.player.body as Phaser.Physics.Arcade.Body;
           const onGround = body.blocked.down;
-          const { width } = this.scale;
+          const width    = this.worldW; // world width — camera scrolls within it
 
           // Touch controls (mobile) feed the same input as the keyboard.
           // jump/action are one-shot: read then clear so a tap fires once.
