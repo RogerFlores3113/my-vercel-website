@@ -30,8 +30,8 @@ function ModalContent({ id }: { id: string }) {
         building projects that solve problems for friends and family.
       </p>
       <p style={s.p}>
-        Open to AI engineering and founding roles. Founding engineer
-        or AI-focused. Bay Area or remote.
+        Open to AI, Forward Deployed, and founding engineering roles.
+        Bay Area or remote.
       </p>
       <p style={s.p}>
         Currently building{" "}
@@ -76,6 +76,35 @@ function ModalContent({ id }: { id: string }) {
         LoRA, weight probes, math.
         <br />
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Local LLMs · LoRA · Writeups</span>
+      </p>
+      <p style={s.p}>
+        <strong style={{ color: "#e8e6e1" }}>Longdle</strong>{" "}
+        <a href="https://longdle.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
+        <br />
+        Daily wordle, but with 6 letters instead of 5. Infinite replayability
+        via a randomizer mode. Try if you dare!
+        <br />
+        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Next.js · Edge · Daily</span>
+      </p>
+      <p style={s.p}>
+        <strong style={{ color: "#e8e6e1" }}>Short</strong>{" "}
+        <a href="https://short.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
+        <br />
+        A URL shortener. Simple, minimal, functional. A test of my own system
+        design and fundamentals.
+        <br />
+        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Next.js · System design</span>
+      </p>
+      <p style={s.p}>
+        <strong style={{ color: "#e8e6e1" }}>Property</strong>{" "}
+        <a href="https://property.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
+        {" "}
+        <span style={{ color: "#73716b", fontSize: 11 }}>discontinued</span>
+        <br />
+        Discontinued, but live. I realized it had technical hurdles best solved
+        by making a new project.
+        <br />
+        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Data</span>
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Search</strong>{" "}
