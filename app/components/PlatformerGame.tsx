@@ -261,7 +261,7 @@ function EscMenu({ onClose }: { onClose: () => void }) {
 }
 
 // ─── Modal overlay ─────────────────────────────────────────────────────────────
-function Modal({ modalId, onClose }: { modalId: string; onClose: () => void }) {
+function Modal({ modalId, onClose, isTouch }: { modalId: string; onClose: () => void; isTouch?: boolean }) {
   const titles: Record<string, string> = {
     landing:  "Roger Flores",
     projects: "Projects",
@@ -296,7 +296,7 @@ function Modal({ modalId, onClose }: { modalId: string; onClose: () => void }) {
         </h2>
         <ModalContent id={modalId} />
         <div style={{ marginTop: 22, borderTop: "1px solid #2d4a1e", paddingTop: 14, fontSize: "clamp(12px, 1vw, 14px)", color: "#4a7c3f", display: "flex", gap: 16 }}>
-          <span>[ESC] close</span>
+          <span>{isTouch ? "tap outside to close" : "[ESC] close"}</span>
           <a href="/boring" style={{ color: "#4a7c3f" }}>Traditional website →</a>
         </div>
       </div>
@@ -304,14 +304,90 @@ function Modal({ modalId, onClose }: { modalId: string; onClose: () => void }) {
   );
 }
 
+// ─── On-screen touch controls (mobile) ──────────────────────────────────────────
+type TouchState = { left: boolean; right: boolean; jumpQueued: boolean; actionQueued: boolean };
+function TouchControls({
+  touchRef, onPause,
+}: { touchRef: React.RefObject<TouchState>; onPause: () => void }) {
+  const btn: React.CSSProperties = {
+    width: 68, height: 68, borderRadius: 14,
+    background: "rgba(26,46,26,0.82)", border: "2px solid #4a7c3f",
+    color: "#9fe1cb", fontSize: 26, fontWeight: 700,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontFamily: "Nunito, Arial Rounded MT Bold, sans-serif",
+    touchAction: "none", userSelect: "none", WebkitUserSelect: "none",
+    WebkitTapHighlightColor: "transparent", cursor: "pointer",
+  };
+  // Held button (left/right): set on press, clear on release/cancel.
+  const hold = (key: "left" | "right") => ({
+    onPointerDown: (e: React.PointerEvent) => { e.preventDefault(); touchRef.current[key] = true; },
+    onPointerUp:   (e: React.PointerEvent) => { e.preventDefault(); touchRef.current[key] = false; },
+    onPointerLeave:() => { touchRef.current[key] = false; },
+    onPointerCancel:() => { touchRef.current[key] = false; },
+  });
+  // One-shot button (jump/action): queue once per press.
+  const oneShot = (key: "jumpQueued" | "actionQueued") => ({
+    onPointerDown: (e: React.PointerEvent) => { e.preventDefault(); touchRef.current[key] = true; },
+  });
+  const wrap: React.CSSProperties = {
+    position: "fixed", bottom: 24, zIndex: 60,
+    display: "flex", gap: 14, alignItems: "center",
+  };
+  return (
+    <>
+      {/* Pause — top-right, opens the menu (Resume / Resume PDF / Traditional site) */}
+      <button
+        onClick={onPause}
+        aria-label="Pause"
+        style={{
+          position: "fixed", top: 14, right: 14, zIndex: 60,
+          width: 44, height: 44, borderRadius: 10,
+          background: "rgba(26,46,26,0.82)", border: "2px solid #4a7c3f",
+          color: "#9fe1cb", fontSize: 16, cursor: "pointer",
+          touchAction: "none", WebkitTapHighlightColor: "transparent",
+        }}
+      >
+        ⏸
+      </button>
+      {/* Left cluster: move left / right */}
+      <div style={{ ...wrap, left: 20 }}>
+        <button aria-label="Move left"  style={btn} {...hold("left")}>◀</button>
+        <button aria-label="Move right" style={btn} {...hold("right")}>▶</button>
+      </div>
+      {/* Right cluster: action (read sign / open link) + jump */}
+      <div style={{ ...wrap, right: 20 }}>
+        <button aria-label="Read sign or open link" style={{ ...btn, fontSize: 13 }} {...oneShot("actionQueued")}>READ</button>
+        <button aria-label="Jump" style={{ ...btn, width: 80, height: 80, background: "rgba(45,74,30,0.9)" }} {...oneShot("jumpQueued")}>JUMP</button>
+      </div>
+    </>
+  );
+}
+
 // ─── PlatformerGame ────────────────────────────────────────────────────────────
 export function PlatformerGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef      = useRef<unknown>(null);
+  // Shared touch-input state read by the Phaser update loop. left/right are
+  // held; jumpQueued/actionQueued are one-shots consumed each frame.
+  const touchRef = useRef({ left: false, right: false, jumpQueued: false, actionQueued: false });
   const [loading,    setLoading]    = useState(true);
   const [loadError,  setLoadError]  = useState(false);
   const [modal,      setModal]      = useState<string | null>(null);
   const [showEscMenu, setShowEscMenu] = useState(false);
+  const [isTouch,    setIsTouch]    = useState(false);
+
+  // Detect touch / small-screen devices so we can show on-screen controls.
+  // The Phaser game is keyboard-only otherwise — unplayable on a phone.
+  useEffect(() => {
+    const check = () => {
+      const coarse = window.matchMedia?.("(pointer: coarse)").matches;
+      const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      setIsTouch(Boolean(coarse) || hasTouch || window.innerWidth <= 820);
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   // ESC: Phaser fires "game-esc"; close modal if open, else show ESC menu
   useEffect(() => {
@@ -736,9 +812,16 @@ export function PlatformerGame() {
             fontFamily: "Nunito, Arial Rounded MT Bold, Trebuchet MS, sans-serif", fontSize: "14px", color: theme.labelColor,
           }).setAlpha(0.7).setDepth(D_UI);
 
-          // Instructions — room 0 only, top-center
+          // Instructions — room 0 only, top-center. Touch devices get touch hints.
           if (this.roomIndex === 0) {
-            this.add.text(width / 2, 18, "WASD / Arrow Keys  ·  SHIFT to sprint  ·  ESC to pause", {
+            const touchLike =
+              window.matchMedia?.("(pointer: coarse)").matches ||
+              "ontouchstart" in window ||
+              window.innerWidth <= 820;
+            const instructions = touchLike
+              ? "◀ ▶ move  ·  JUMP  ·  READ signs  ·  ⏸ menu"
+              : "WASD / Arrow Keys  ·  SHIFT to sprint  ·  ESC to pause";
+            this.add.text(width / 2, 18, instructions, {
               fontFamily: "Arial, Helvetica, sans-serif",
               fontStyle: "bold",
               fontSize: "16px",
@@ -1033,13 +1116,19 @@ export function PlatformerGame() {
           const onGround = body.blocked.down;
           const { width } = this.scale;
 
-          const left  = this.cursors.left.isDown  || this.wasd.left.isDown;
-          const right = this.cursors.right.isDown || this.wasd.right.isDown;
+          // Touch controls (mobile) feed the same input as the keyboard.
+          // jump/action are one-shot: read then clear so a tap fires once.
+          const touch = touchRef.current;
+          const left  = this.cursors.left.isDown  || this.wasd.left.isDown  || touch.left;
+          const right = this.cursors.right.isDown || this.wasd.right.isDown || touch.right;
           const sprint = this.shiftKey.isDown;
-          const jumpPressed =
+          let jumpPressed =
             Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
             Phaser.Input.Keyboard.JustDown(this.wasd.up)    ||
             Phaser.Input.Keyboard.JustDown(this.jumpKey);
+          if (touch.jumpQueued) { jumpPressed = true; touch.jumpQueued = false; }
+          let actionPressed = Phaser.Input.Keyboard.JustDown(this.enterKey);
+          if (touch.actionQueued) { actionPressed = true; touch.actionQueued = false; }
 
           const speed    = sprint ? this.SPEED * 1.75 : this.SPEED;
           const anyInput = left || right || jumpPressed;
@@ -1100,7 +1189,7 @@ export function PlatformerGame() {
               this.tweens.add({ targets: this.signHints[nearSignIdx], alpha: 1, duration: 150 });
             this.activeSignIdx = nearSignIdx;
           }
-          if (nearSignIdx >= 0 && Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+          if (nearSignIdx >= 0 && actionPressed) {
             window.dispatchEvent(new CustomEvent("open-modal", {
               detail: { modalId: this.signDefs[nearSignIdx].modalId },
             }));
@@ -1121,7 +1210,9 @@ export function PlatformerGame() {
               this.tweens.add({ targets: this.socialHints[nearSocialIdx], alpha: 1, duration: 150 });
             this.activeSocial = nearSocialIdx;
           }
-          if (nearSocialIdx >= 0 && Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+          // Prefer the sign (modal) when standing near both — avoids a single
+          // press firing a modal and a social link at the same x position.
+          if (nearSocialIdx >= 0 && nearSignIdx < 0 && actionPressed) {
             window.dispatchEvent(new CustomEvent("open-social", {
               detail: { url: this.socialLinks[nearSocialIdx].url },
             }));
@@ -1242,8 +1333,14 @@ export function PlatformerGame() {
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
       {loading && !loadError && <GameLoader />}
       {loadError && <GameLoader error />}
-      {modal && <Modal modalId={modal} onClose={() => setModal(null)} />}
+      {modal && <Modal modalId={modal} onClose={() => setModal(null)} isTouch={isTouch} />}
       {showEscMenu && <EscMenu onClose={() => setShowEscMenu(false)} />}
+      {isTouch && !loading && !loadError && (
+        <TouchControls
+          touchRef={touchRef}
+          onPause={() => window.dispatchEvent(new CustomEvent("game-esc"))}
+        />
+      )}
       <div
         ref={containerRef}
         style={{
