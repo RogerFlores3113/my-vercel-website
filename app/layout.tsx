@@ -33,15 +33,8 @@ export const metadata: Metadata = {
 };
 
 /* ------------------------------------------------
-   CTA Banner — reusable, used by (site) pages
-   Re-exported here for backward compat with existing imports.
-   ------------------------------------------------ */
-export { CTABanner } from "./components/CTABanner";
-
-/* ------------------------------------------------
    Root Layout — bare HTML shell only.
-   Nav + footer live in app/(site)/layout.tsx.
-   The game page (/) gets this shell with nothing else.
+   The game page (/) and /boring each render their own chrome.
    ------------------------------------------------ */
 export default function RootLayout({
   children,
