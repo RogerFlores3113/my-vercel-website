@@ -29,21 +29,20 @@ function ModalContent({ id }: { id: string }) {
 
   if (id === "landing") return (
     <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/full_profile.jpg"
+        alt="Roger Flores"
+        style={{
+          display: "block", width: "100%", maxWidth: 240, margin: "0 auto 18px",
+          aspectRatio: "4 / 5", objectFit: "cover", objectPosition: "center top",
+          borderRadius: 12, border: "2px solid #2d4a1e",
+        }}
+      />
       <p style={s.p}>
         AI engineer in the SF Bay Area. Northeastern CS, then production
         work for Fortune 500s and county governments. These days I&apos;m
         building projects that solve problems for friends and family.
-      </p>
-      <p style={s.p}>
-        Open to AI, Forward Deployed, and founding engineering roles.
-        Bay Area or remote.
-      </p>
-      <p style={s.p}>
-        Currently building{" "}
-        <a href="https://podium.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Podium</a>
-        {", "}
-        <a href="https://experiments.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Experiments</a>
-        {", and Search."}
       </p>
       <p style={s.p}>
         <a href="mailto:rflores3113@gmail.com" style={{ color: "#5dcaa5" }}>
@@ -74,6 +73,20 @@ function ModalContent({ id }: { id: string }) {
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Next.js · TypeScript · AWS · Terraform · RAG</span>
       </p>
       <p style={s.p}>
+        <strong style={{ color: "#e8e6e1" }}>Search</strong>{" "}
+        <a href="https://github.com/RogerFlores3113/search" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ GitHub</a>
+        {" "}
+        <span style={{ color: "#73716b", fontSize: 11 }}>WIP</span>
+        <br />
+        A generalized agentic web search app. Drives your local browser instance,
+        clicks for you, collects data, and reports back. Highly customizable. Not
+        deployed —{" "}
+        <a href="mailto:rflores3113@gmail.com" style={{ color: "#5dcaa5" }}>contact me</a>{" "}
+        if you&apos;d like to try.
+        <br />
+        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Agents · Local LLMs · Modular</span>
+      </p>
+      <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Experiments</strong>{" "}
         <a href="https://experiments.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
         <br />
@@ -85,6 +98,8 @@ function ModalContent({ id }: { id: string }) {
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Longdle</strong>{" "}
         <a href="https://longdle.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
+        {" · "}
+        <a href="https://github.com/RogerFlores3113/longdle" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ GitHub</a>
         <br />
         Daily wordle, but with 6 letters instead of 5. Infinite replayability
         via a randomizer mode. Try if you dare!
@@ -93,33 +108,12 @@ function ModalContent({ id }: { id: string }) {
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Short</strong>{" "}
-        <a href="https://short.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
+        <a href="https://github.com/RogerFlores3113/short" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ GitHub</a>
         <br />
         A URL shortener. Simple, minimal, functional. A test of my own system
         design and fundamentals.
         <br />
         <span style={{ color: "#5dcaa5", fontSize: 11 }}>Next.js · System design</span>
-      </p>
-      <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>Property</strong>{" "}
-        <a href="https://property.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
-        {" "}
-        <span style={{ color: "#73716b", fontSize: 11 }}>discontinued</span>
-        <br />
-        Discontinued, but live. I realized it had technical hurdles best solved
-        by making a new project.
-        <br />
-        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Data</span>
-      </p>
-      <p style={s.p}>
-        <strong style={{ color: "#e8e6e1" }}>Search</strong>{" "}
-        <span style={{ color: "#73716b", fontSize: 11 }}>WIP · local-model-only</span>
-        <br />
-        Generalized agentic web search via screenshot-click loop. Collects
-        apartment listings, recruiting leads, job openings, anything in a
-        mass-search format.
-        <br />
-        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Agents · Local LLMs · Modular</span>
       </p>
     </>
   );
@@ -132,22 +126,26 @@ function ModalContent({ id }: { id: string }) {
         projects that solve problems for friends and family.
       </p>
       <p style={s.p}>
-        I do the whole stack. I love helping other people, and I&apos;m proud
+        I do the whole stack. I love helping other people and I&apos;m proud
         of what I do, but I try not to take myself too seriously while doing so.
+        I enjoy rock climbing, learning to fly, and slightly-too-long board
+        games. And puns, of course.
       </p>
       <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Now</p>
       <p style={s.p}>
-        Building{" "}
         <a href="https://podium.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Podium</a>
-        {", Experiments, and Search. "}
-        Training toward my PPL (private pilot license).
+        {", "}
+        <a href="https://experiments.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Experiments</a>
+        {", and "}
+        <a href="https://github.com/RogerFlores3113/search" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Search</a>
+        {"."}
       </p>
       <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Off the clock</p>
       <p style={s.p}>
-        Learning to fly small planes, climbing rocks indoors, walking Bay Area
-        trails, crushing people at board games (Terraforming Mars, Blood on the
-        Clocktower), and reading a stack of books that keeps growing.
-        Also red pandas, obviously.
+        Learning to fly small planes (training toward my PPL, private pilot
+        license), climbing rocks indoors, walking Bay Area trails, crushing
+        people at board games (Terraforming Mars, Blood on the Clocktower), and
+        reading a stack of books that keeps growing. Also red pandas, obviously.
       </p>
     </>
   );
@@ -158,26 +156,28 @@ function ModalContent({ id }: { id: string }) {
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Atomic Habits</strong> | Clear
         <br />
-        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Currently reading</span>
-        {" · "}Very good, easy read. Highly recommend.
+        Very good, easy read. Highly recommend.
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Foundation</strong> | Asimov
         <br />
-        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Worth reading</span>
-        {" · "}1950s vibes but fascinating to see where sci-fi started.
+        1950s vibes but fascinating to see where sci-fi started.
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>A Random Walk Down Wall Street</strong> | Malkiel
         <br />
-        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Loved it</span>
-        {" · "}Solid framework for making good money decisions.
+        Solid framework for making good money decisions.
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Runnin&apos; Down a Dream</strong> | Gurley
         <br />
-        <span style={{ color: "#5dcaa5", fontSize: 11 }}>Good reference</span>
-        {" · "}The reading list at the end is worth the price alone.
+        The reading list at the end is worth the price alone.
+      </p>
+      <p style={s.p}>
+        <strong style={{ color: "#e8e6e1" }}>Notes on Being a Man</strong> | Galloway
+        <br />
+        Fairly decent life advice, though it&apos;s the kind people rarely take
+        unless they already agree with it.
       </p>
       <p style={{ ...s.p, color: "#73716b" }}>
         Recommendations welcome:{" "}
