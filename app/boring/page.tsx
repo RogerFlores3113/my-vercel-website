@@ -17,7 +17,7 @@ export default function Boring() {
             <a href="#projects">projects</a><span className="sep">·</span>
             <a href="#about">about</a><span className="sep">·</span>
             <a href="#chat">chat</a><span className="sep">·</span>
-            <a href="https://rogerflores.dev/rflores_resume.pdf">resume</a>
+            <a href="/rflores_resume.pdf">resume</a>
             <span className="badges" aria-label="Profiles">
               <a className="badge gh" href="https://github.com/RogerFlores3113" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -406,7 +406,7 @@ export default function Boring() {
                 <span className="arrow">→</span>
               </a>
               <div className="cta-also">
-                or grab the <a href="https://rogerflores.dev/rflores_resume.pdf">resume (pdf)</a> ·{' '}
+                or grab the <a href="/rflores_resume.pdf">resume (pdf)</a> ·{' '}
                 <a href="https://www.linkedin.com/in/roger-flores-3113-nu/">LinkedIn</a>
               </div>
             </div>
