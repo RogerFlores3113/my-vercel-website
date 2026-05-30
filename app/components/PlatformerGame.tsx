@@ -1018,18 +1018,32 @@ export function PlatformerGame() {
               "GitHub":   "github-badge",
               "Email":    "gmail-badge",
             };
-            // Sink badges solidly into the stone tile layer
-            const badgeY = groundY + grassH + dirtH + 48;
+            // Sink badges solidly into the stone tile layer. On touch devices the
+            // fixed movement buttons sit at the bottom of the viewport, so raise
+            // the badges up into the dirt band to keep them clear of the controls.
+            const touchLike =
+              window.matchMedia?.("(pointer: coarse)").matches ||
+              "ontouchstart" in window ||
+              window.innerWidth <= 820;
+            const badgeY = touchLike
+              ? groundY + grassH + dirtH / 2
+              : groundY + grassH + dirtH + 48;
+            // In the stone layer the badges sit above the stone tiles (D_GROUND=3)
+            // at D_FGPROP. In the dirt band the dirt/grass tile layers render at very
+            // high depths (D_DIRT=750, D_GRASS=850, grass edge=1000), so mount the
+            // badges above all of them. They're spatially in the dirt band, well below
+            // the grass strip, so there's no visual conflict with the ground cap.
+            const badgeDepth = touchLike ? 1010 : D_FGPROP;
             for (const soc of theme.socials) {
               const sx = Math.round(soc.xFrac * width);
               this.socialLinks.push({ x: sx, url: soc.url });
               if (this.textures.exists("stone-emblem-display"))
                 this.add.image(sx, badgeY, "stone-emblem-display")
-                  .setOrigin(0.5, 0.5).setDepth(D_FGPROP);
+                  .setOrigin(0.5, 0.5).setDepth(badgeDepth);
               const badgeKey = badgeKeyMap[soc.label];
               if (badgeKey && this.textures.exists(badgeKey)) {
                 const badgeImg = this.add.image(sx, badgeY, badgeKey)
-                  .setOrigin(0.5, 0.5).setDepth(D_FGPROP + 0.1);
+                  .setOrigin(0.5, 0.5).setDepth(badgeDepth + 0.1);
                 badgeImg.setInteractive({ useHandCursor: true });
                 badgeImg.on("pointerdown", () => window.open(soc.url, "_blank"));
               }
@@ -1042,7 +1056,7 @@ export function PlatformerGame() {
                   color:      "#f5eecc",
                   stroke:     "#1a3d0f",
                   strokeThickness: 2,
-                }).setOrigin(0.5, 0).setDepth(D_FGPROP + 0.2);
+                }).setOrigin(0.5, 0).setDepth(badgeDepth + 0.2);
               }
             }
           }
