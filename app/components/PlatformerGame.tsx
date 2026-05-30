@@ -156,22 +156,31 @@ function ModalContent({ id }: { id: string }) {
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Atomic Habits</strong> | Clear
         <br />
-        Very good, easy read. Highly recommend.
+        Very good, easy read. Highly recommend. 1% better, every day. Isn&apos;t
+        that just a wonderful idea?
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Foundation</strong> | Asimov
         <br />
-        1950s vibes but fascinating to see where sci-fi started.
+        1950s vibes but fascinating to see where sci-fi started. I still smile
+        every time I read an old sci-fi novel and every character smokes a cigar.
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>A Random Walk Down Wall Street</strong> | Malkiel
         <br />
-        Solid framework for making good money decisions.
+        Advises holding broad-based index funds, for some involved reasons. But
+        the history lessons on bubbles and the frameworks for calculating a
+        theoretical stock price are all fascinating. A must-read for anyone
+        interested in trading.
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Runnin&apos; Down a Dream</strong> | Gurley
         <br />
-        The reading list at the end is worth the price alone.
+        The reading list at the end is worth the price alone. I&apos;ve heard
+        success doesn&apos;t come unless you&apos;re at least a little bit crazy.
+        Or a lot. This book pushes that the people who make it went all-in at
+        some point. If you want to chase your dream, think about when the right
+        time to go all-in would be...
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Notes on Being a Man</strong> | Galloway
