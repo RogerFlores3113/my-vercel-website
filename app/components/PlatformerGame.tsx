@@ -80,7 +80,7 @@ function ModalContent({ id }: { id: string }) {
         <br />
         A generalized agentic web search app. Drives your local browser instance,
         clicks for you, collects data, and reports back. Highly customizable. Not
-        deployed —{" "}
+        deployed, but{" "}
         <a href="mailto:rflores3113@gmail.com" style={{ color: "#5dcaa5" }}>contact me</a>{" "}
         if you&apos;d like to try.
         <br />
