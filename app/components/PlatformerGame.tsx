@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { GameLoader } from "./GameLoader";
+import { GITHUB_URL, LINKEDIN_URL, githubRepo } from "@/app/lib/socialLinks";
 
 // ─── Room config (order = left-to-right in the world) ─────────────────────────
 const ROOMS = [
@@ -49,11 +50,11 @@ function ModalContent({ id }: { id: string }) {
           rflores3113@gmail.com
         </a>
         {" · "}
-        <a href="https://github.com/RogerFlores3113" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>
+        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>
           GitHub
         </a>
         {" · "}
-        <a href="https://www.linkedin.com/in/roger-flores-3113-nu/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>
+        <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>
           LinkedIn
         </a>
       </p>
@@ -74,7 +75,7 @@ function ModalContent({ id }: { id: string }) {
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Search</strong>{" "}
-        <a href="https://github.com/RogerFlores3113/search" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ GitHub</a>
+        <a href={githubRepo("search")} target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ GitHub</a>
         {" "}
         <span style={{ color: "#73716b", fontSize: 11 }}>WIP</span>
         <br />
@@ -99,7 +100,7 @@ function ModalContent({ id }: { id: string }) {
         <strong style={{ color: "#e8e6e1" }}>Longdle</strong>{" "}
         <a href="https://longdle.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ live</a>
         {" · "}
-        <a href="https://github.com/RogerFlores3113/longdle" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ GitHub</a>
+        <a href={githubRepo("longdle")} target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ GitHub</a>
         <br />
         Daily wordle, but with 6 letters instead of 5. Infinite replayability
         via a randomizer mode. Try if you dare!
@@ -108,7 +109,7 @@ function ModalContent({ id }: { id: string }) {
       </p>
       <p style={s.p}>
         <strong style={{ color: "#e8e6e1" }}>Short</strong>{" "}
-        <a href="https://github.com/RogerFlores3113/short" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ GitHub</a>
+        <a href={githubRepo("short")} target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5", fontSize: 12 }}>↗ GitHub</a>
         <br />
         A URL shortener. Simple, minimal, functional. A test of my own system
         design and fundamentals.
@@ -137,7 +138,7 @@ function ModalContent({ id }: { id: string }) {
         {", "}
         <a href="https://experiments.rogerflores.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Experiments</a>
         {", and "}
-        <a href="https://github.com/RogerFlores3113/search" target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Search</a>
+        <a href={githubRepo("search")} target="_blank" rel="noopener noreferrer" style={{ color: "#5dcaa5" }}>Search</a>
         {"."}
       </p>
       <p style={{ ...s.p, color: "#9fe1cb", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Off the clock</p>
@@ -507,8 +508,8 @@ export function PlatformerGame() {
             { xFrac: 0.78, modalId: "reading"  },
           ],
           socials: [
-            { xFrac: 0.25, url: "https://www.linkedin.com/in/roger-flores-3113-nu/", label: "LinkedIn" },
-            { xFrac: 0.50, url: "https://github.com/RogerFlores3113",               label: "GitHub"   },
+            { xFrac: 0.25, url: LINKEDIN_URL, label: "LinkedIn" },
+            { xFrac: 0.50, url: GITHUB_URL,   label: "GitHub"   },
             { xFrac: 0.75, url: "mailto:rflores3113@gmail.com",                     label: "Email"    },
           ],
         },

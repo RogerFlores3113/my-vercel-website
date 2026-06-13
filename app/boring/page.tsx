@@ -1,4 +1,5 @@
 import { BoringClient, JokeCard, CalendarWidget, ComingSoonLink, GameVersionLink } from './BoringClient'
+import { GITHUB_URL, LINKEDIN_URL } from '@/app/lib/socialLinks'
 
 export default function Boring() {
   return (
@@ -19,12 +20,12 @@ export default function Boring() {
             <a href="#chat">chat</a><span className="sep">·</span>
             <a href="/rflores_resume.pdf">resume</a>
             <span className="badges" aria-label="Profiles">
-              <a className="badge gh" href="https://github.com/RogerFlores3113" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+              <a className="badge gh" href={GITHUB_URL} target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z" />
                 </svg>
               </a>
-              <a className="badge li" href="https://www.linkedin.com/in/roger-flores-3113-nu/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
+              <a className="badge li" href={LINKEDIN_URL} target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.95v5.66H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.62 0 4.29 2.38 4.29 5.48v6.26zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z" />
                 </svg>
@@ -407,7 +408,7 @@ export default function Boring() {
               </a>
               <div className="cta-also">
                 or grab the <a href="/rflores_resume.pdf">resume (pdf)</a> ·{' '}
-                <a href="https://www.linkedin.com/in/roger-flores-3113-nu/">LinkedIn</a>
+                <a href={LINKEDIN_URL}>LinkedIn</a>
               </div>
             </div>
 
@@ -426,12 +427,12 @@ export default function Boring() {
       <footer>
         <div>© 2026 Roger Flores · rogerflores.dev/boring</div>
         <div className="socials">
-          <a href="https://github.com/RogerFlores3113" target="_blank" rel="noopener" aria-label="GitHub">
+          <a href={GITHUB_URL} target="_blank" rel="noopener" aria-label="GitHub">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z" />
             </svg>
           </a>
-          <a href="https://www.linkedin.com/in/roger-flores-3113-nu/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <a href={LINKEDIN_URL} target="_blank" rel="noopener" aria-label="LinkedIn">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.95v5.66H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.62 0 4.29 2.38 4.29 5.48v6.26zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z" />
             </svg>
